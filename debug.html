@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Debug Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            padding: 5px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-error { color: #dc3545; }
+        .log-success { color: #28a745; }
+        .log-warning { color: #ffc107; }
+        .log-info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-section">
+            <h1>🔍 IELTS App Debug Test</h1>
+            <p style="color: #666; margin-bottom: 20px;">Kiểm tra tất cả các module và tính năng</p>
+            
+            <div id="testResults"></div>
+            
+            <div class="tab-buttons">
+                <button class="btn btn-primary" onclick="runAllTests()">▶️ Chạy tất cả test</button>
+                <button class="btn btn-success" onclick="testStorage()">💾 Test Storage</button>
+                <button class="btn btn-primary" onclick="testTimer()">⏱️ Test Timer</button>
+                <button class="btn btn-danger" onclick="clearLog()">🗑️ Xóa log</button>
+            </div>
+            
+            <div id="logContainer" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Config if not available
+        if (!window.Config) {
+            window.Config = {
+                OPENAI_API_KEY: 'test_key',
+                ENABLE_AI_FEATURES: false
+            };
+        }
+
+        // Logging function
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = '';
+        }
+
+        // Test Storage Module
+        function testStorage() {
+            log('=== Testing Storage Module ===', 'info');
+            
+            try {
+                // Test basic operations
+                const testData = { test: 'value', number: 123 };
+                
+                // Set
+                const setResult = Storage.set('test_key', testData);
+                log(setResult ? '✅ Storage.set() works' : '❌ Storage.set() failed', setResult ? 'success' : 'error');
+                
+                // Get
+                const getData = Storage.get('test_key');
+                const getResult = getData && getData.test === 'value';
+                log(getResult ? '✅ Storage.get() works' : '❌ Storage.get() failed', getResult ? 'success' : 'error');
+                
+                // Remove
+                Storage.remove('test_key');
+                const removeResult = Storage.get('test_key') === null;
+                log(removeResult ? '✅ Storage.remove() works' : '❌ Storage.remove() failed', removeResult ? 'success' : 'error');
+                
+                // Test user data
+                const userData = Storage.getUserData();
+                log(`✅ User data loaded: ${JSON.stringify(userData)}`, 'success');
+                
+                // Test progress
+                const progress = Storage.getProgress();
+                log(`✅ Progress loaded: ${progress.completed} tests completed`, 'success');
+                
+                log('=== Storage tests completed ===', 'success');
+                
+            } catch (error) {
+                log(`❌ Storage test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test Timer Module
+        function testTimer() {
+            log('=== Testing Timer Module ===', 'info');
+            
+            try {
+                // Test initialization
+                log(`✅ Timer initialized: ${Timer.state.totalSeconds}s total`, 'success');
+                
+                // Test format time
+                const formatted = Timer.getFormattedTime();
+                log(`✅ Time format: ${formatted.formatted}`, 'success');
+                
+                // Test set duration
+                Timer.setDuration(300);
+                log(`✅ Duration set to 300s (5 minutes)`, 'success');
+                
+                // Reset
+                Timer.reset();
+                log(`✅ Timer reset`, 'success');
+                
+                log('=== Timer tests completed ===', 'success');
+                
+            } catch (error) {
+                log(`❌ Timer test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test Utils Module
+        function testUtils() {
+            log('=== Testing Utils Module ===', 'info');
+            
+            try {
+                // Test time format
+                const time = Utils.formatTime(125);
+                log(time === '02:05' ? '✅ formatTime() works' : '❌ formatTime() failed', time === '02:05' ? 'success' : 'error');
+                
+                // Test band score calculation
+                const band = Utils.calculateBandScore(35, 40);
+                log(`✅ Band score for 35/40: ${band}`, 'success');
+                
+                // Test ID generation
+                const id = Utils.generateId();
+                log(`✅ Generated ID: ${id}`, 'success');
+                
+                // Test percentage
+                const percent = Utils.calculatePercentage(30, 40, 1);
+                log(percent === 75.0 ? '✅ calculatePercentage() works' : '❌ calculatePercentage() failed', percent === 75.0 ? 'success' : 'error');
+                
+                log('=== Utils tests completed ===', 'success');
+                
+            } catch (error) {
+                log(`❌ Utils test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test Vocabulary Module
+        function testVocabulary() {
+            log('=== Testing Vocabulary Module ===', 'info');
+            
+            try {
+                // Load vocabulary
+                const vocabList = Storage.getVocabulary();
+                log(`✅ Vocabulary loaded: ${vocabList.length} words`, 'success');
+                
+                // Get statistics
+                const stats = Vocabulary.getStatistics();
+                log(`✅ Vocab stats: ${stats.total} total, ${stats.mastered} mastered`, 'success');
+                
+                log('=== Vocabulary tests completed ===', 'success');
+                
+            } catch (error) {
+                log(`❌ Vocabulary test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test Dashboard Module
+        function testDashboard() {
+            log('=== Testing Dashboard Module ===', 'info');
+            
+            try {
+                // Load data
+                Dashboard.loadData();
+                log('✅ Dashboard data loaded', 'success');
+                
+                // Get performance
+                const performance = Dashboard.getPerformanceSummary();
+                log(`✅ Performance: ${performance.overall} overall, ${performance.trend} trend`, 'success');
+                
+                log('=== Dashboard tests completed ===', 'success');
+                
+            } catch (error) {
+                log(`❌ Dashboard test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test Practice Module
+        function testPractice() {
+            log('=== Testing Practice Module ===', 'info');
+            
+            try {
+                // Get sample tests
+                const samples = Practice.getSampleTests();
+                log(`✅ Sample tests loaded: ${samples.length} tests`, 'success');
+                
+                log('=== Practice tests completed ===', 'success');
+                
+            } catch (error) {
+                log(`❌ Practice test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Run all tests
+        function runAllTests() {
+            clearLog();
+            log('🚀 Starting comprehensive tests...', 'info');
+            log('', 'info');
+            
+            setTimeout(() => testStorage(), 100);
+            setTimeout(() => testTimer(), 500);
+            setTimeout(() => testUtils(), 900);
+            setTimeout(() => testVocabulary(), 1300);
+            setTimeout(() => testDashboard(), 1700);
+            setTimeout(() => testPractice(), 2100);
+            
+            setTimeout(() => {
+                log('', 'info');
+                log('✅ All tests completed!', 'success');
+            }, 2500);
+        }
+
+        // Check if modules are loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            log('🔍 Checking modules...', 'info');
+            
+            const modules = ['Storage', 'Timer', 'Utils', 'Vocabulary', 'Dashboard', 'Practice', 'ErrorTracker', 'FileParser'];
+            
+            modules.forEach(module => {
+                if (window[module]) {
+                    log(`✅ ${module} loaded`, 'success');
+                } else {
+                    log(`❌ ${module} NOT loaded`, 'error');
+                }
+            });
+            
+            log('', 'info');
+            log('Click "Chạy tất cả test" để bắt đầu kiểm tra', 'info');
+        });
+    </script>
+
+    <!-- Load all modules -->
+    <script src="js/app.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/error-tracker.js"></script>
+    <script src="js/file_parser.js"></script>
+    <script src="js/practice.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/vocabulary.js"></script>
+</body>
+</html>

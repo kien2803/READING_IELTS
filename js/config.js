@@ -1,18 +1,19 @@
 /* ==========================================
    API Configuration
-   QUAN TRỌNG: File này KHÔNG được commit lên Git
-   Thêm vào .gitignore: js/config.js
+   IMPORTANT: Do not commit this file to Git
+   Add to .gitignore: js/config.js
    ========================================== */
 
 const Config = {
     // OpenAI API Configuration
-    OPENAI_API_KEY: 'YOUR_API_KEY_HERE', // ⚠️ Thay bằng key mới sau khi xóa key cũ
+    // Replace YOUR_API_KEY_HERE with your actual OpenAI API key
+    OPENAI_API_KEY: 'YOUR_API_KEY_HERE',
     
     // API Endpoints
     OPENAI_ENDPOINT: 'https://api.openai.com/v1/chat/completions',
     
     // Model Configuration
-    AI_MODEL: 'gpt-4', // Hoặc 'gpt-4' nếu muốn chất lượng cao hơn
+    AI_MODEL: 'gpt-3.5-turbo', // Or 'gpt-4' for higher quality
     
     // Rate Limiting
     MAX_TOKENS: 1500,
@@ -28,5 +29,5 @@ window.Config = Config;
 
 // Validate API Key
 if (Config.OPENAI_API_KEY === 'YOUR_API_KEY_HERE') {
-    console.warn('⚠️ API Key chưa được cấu hình! Vui lòng thêm key vào js/config.js');
+    console.warn('WARNING: API Key not configured! Please add your key to js/config.js');
 }

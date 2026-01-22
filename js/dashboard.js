@@ -650,6 +650,11 @@ Format in clear sections with emojis. Be encouraging but honest. Keep it practic
 
         return `<div class="ai-analysis-content">${formatted}</div>`;
     },
+
+    /**
+     * Check achievements
+     */
+    checkAchievements() {
         const progress = this.progressData;
 
         // First test
