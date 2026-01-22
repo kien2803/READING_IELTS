@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IELTS Reading Practice - Road to 9.0">
+    <title>IELTS Reading - Road to 9.0</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/practice.css">
+    <link rel="stylesheet" href="css/vocabulary.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🎯 IELTS Reading - Road to 9.0</h1>
+                <nav class="nav-tabs">
+                    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+                    <button class="tab-btn" data-tab="practice">Luyện tập</button>
+                    <button class="tab-btn" data-tab="vocabulary">Từ vựng</button>
+                    <button class="tab-btn" data-tab="errors">Lỗi sai</button>
+                    <button class="tab-btn" data-tab="upload">Upload</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Dashboard Tab -->
+        <section id="dashboard" class="tab-content active">
+            <div class="dashboard-grid">
+                <!-- Progress Card -->
+                <div class="card">
+                    <h3 class="card-title">📊 Tiến độ học tập</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overallProgress" data-progress="45">
+                            <span>45%</span>
+                        </div>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="completedTests">0</div>
+                            <div class="stat-label">Bài đã hoàn thành</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="averageScore">0.0</div>
+                            <div class="stat-label">Điểm trung bình</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalTime">0h</div>
+                            <div class="stat-label">Thời gian luyện</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="vocabCount">0</div>
+                            <div class="stat-label">Từ vựng đã học</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Analysis Card - NEW -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 class="card-title" style="margin: 0;">🤖 Phân tích AI</h3>
+                        <button class="btn btn-sm btn-primary" onclick="Dashboard.generateAIAnalysis()" id="aiAnalysisBtn">
+                            ✨ Phân tích ngay
+                        </button>
+                    </div>
+                    <div id="aiAnalysisContent">
+                        <p class="empty-state">Nhấn "Phân tích ngay" để AI đánh giá năng lực và đề xuất lộ trình cải thiện cho bạn.</p>
+                    </div>
+                </div>
+
+                <!-- Goal Card -->
+                <div class="card">
+                    <h3 class="card-title">🎯 Mục tiêu hiện tại</h3>
+                    <div class="goal-info">
+                        <p class="goal-target">Target: <strong>Band 8.0</strong></p>
+                        <p class="goal-description">Tiến độ đạt mục tiêu:</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="goalProgress" data-progress="62">
+                                <span>62%</span>
+                            </div>
+                        </div>
+                        <p class="goal-remaining">Còn <span id="remainingTests">15</span> bài nữa để đạt mục tiêu!</p>
+                    </div>
+                </div>
+
+                <!-- Weakness Analysis Card -->
+                <div class="card">
+                    <h3 class="card-title">📈 Dạng bài cần cải thiện</h3>
+                    <div class="weakness-list">
+                        <div class="weakness-item">
+                            <div class="weakness-header">
+                                <span class="weakness-name">Matching Headings</span>
+                                <span class="weakness-percent">55%</span>
+                            </div>
+                            <div class="progress-bar small">
+                                <div class="progress-fill" style="width: 55%;"></div>
+                            </div>
+                        </div>
+                        <div class="weakness-item">
+                            <div class="weakness-header">
+                                <span class="weakness-name">True/False/Not Given</span>
+                                <span class="weakness-percent">68%</span>
+                            </div>
+                            <div class="progress-bar small">
+                                <div class="progress-fill" style="width: 68%;"></div>
+                            </div>
+                        </div>
+                        <div class="weakness-item">
+                            <div class="weakness-header">
+                                <span class="weakness-name">Summary Completion</span>
+                                <span class="weakness-percent">72%</span>
+                            </div>
+                            <div class="progress-bar small">
+                                <div class="progress-fill" style="width: 72%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <h3 class="card-title">📅 Hoạt động gần đây</h3>
+                    <div class="activity-list" id="recentActivity">
+                        <p class="empty-state">Chưa có hoạt động nào</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Tab -->
+        <section id="practice" class="tab-content">
+            <!-- Test Selector Section -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 class="card-title" style="margin: 0;">📚 Chọn đề thi để luyện tập</h3>
+                    <button class="btn btn-sm btn-primary" onclick="App.switchTab('upload')">
+                        ➕ Upload đề mới
+                    </button>
+                </div>
+                <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                    💡 <strong>Tip:</strong> Click vào đề thi để chọn, sau đó chọn "Full Test" hoặc dạng bài cụ thể.
+                </p>
+                <div class="test-selector-grid" id="testSelectorGrid">
+                    <p class="empty-state">Đang tải danh sách đề thi...</p>
+                </div>
+            </div>
+
+            <!-- Level & Question Type Selection (Hidden until test selected) -->
+            <div id="testConfigSection" style="display: none;">
+                <div class="card">
+                    <h3 class="card-title">🎯 Chọn mức độ khó (Tùy chọn)</h3>
+                    <div class="level-selector" id="levelSelector">
+                        <button class="level-btn active" data-level="5.0">Band 5.0</button>
+                        <button class="level-btn" data-level="6.0">Band 6.0</button>
+                        <button class="level-btn" data-level="6.5">Band 6.5</button>
+                        <button class="level-btn" data-level="7.0">Band 7.0</button>
+                        <button class="level-btn" data-level="7.5">Band 7.5</button>
+                        <button class="level-btn" data-level="8.0">Band 8.0</button>
+                        <button class="level-btn" data-level="8.5">Band 8.5</button>
+                        <button class="level-btn" data-level="9.0">Band 9.0</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">📝 Chọn cách luyện tập</h3>
+                    <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                        Chọn <strong>Full Test</strong> để làm tất cả câu hỏi, hoặc chọn dạng bài cụ thể để luyện tập riêng.
+                    </p>
+                    <div class="question-types-grid" id="questionTypesGrid">
+                        <div class="question-type-card" data-type="full-test">
+                            <div class="question-icon">📋</div>
+                            <h4>Full Test</h4>
+                            <p>Làm tất cả câu hỏi trong đề</p>
+                        </div>
+                        <div class="question-type-card" data-type="multiple-choice">
+                            <div class="question-icon">📝</div>
+                            <h4>Multiple Choice</h4>
+                            <p>Câu hỏi trắc nghiệm</p>
+                        </div>
+                        <div class="question-type-card" data-type="tfng">
+                            <div class="question-icon">✓✗</div>
+                            <h4>True/False/Not Given</h4>
+                            <p>Đúng/Sai/Không có</p>
+                        </div>
+                        <div class="question-type-card" data-type="matching-headings">
+                            <div class="question-icon">📑</div>
+                            <h4>Matching Headings</h4>
+                            <p>Ghép tiêu đề đoạn văn</p>
+                        </div>
+                        <div class="question-type-card" data-type="summary">
+                            <div class="question-icon">📋</div>
+                            <h4>Summary Completion</h4>
+                            <p>Hoàn thành tóm tắt</p>
+                        </div>
+                        <div class="question-type-card" data-type="sentence">
+                            <div class="question-icon">✍️</div>
+                            <h4>Sentence Completion</h4>
+                            <p>Hoàn thành câu</p>
+                        </div>
+                        <div class="question-type-card" data-type="ynng">
+                            <div class="question-icon">❓</div>
+                            <h4>Yes/No/Not Given</h4>
+                            <p>Có/Không/Không có</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timer Section -->
+            <div class="timer-section card" id="timerSection" style="display: none;">
+                <h3 class="card-title">⏱️ Bộ đếm thời gian</h3>
+                <div class="timer-display" id="timerDisplay">60:00</div>
+                <div class="timer-controls">
+                    <button class="btn btn-success" id="startTimer">Bắt đầu</button>
+                    <button class="btn btn-warning" id="pauseTimer">Tạm dừng</button>
+                    <button class="btn btn-primary" id="resetTimer">Reset</button>
+                </div>
+                <p style="margin-top: 10px; font-size: 13px; color: #666; text-align: center;">
+                    💡 Timer sẽ tự động bắt đầu khi bạn chọn dạng bài
+                </p>
+            </div>
+
+            <!-- Passage Container -->
+            <div class="passage-container" id="passageContainer" style="display: none;">
+                <div class="passage-panel">
+                    <div class="passage-header">
+                        <h3>Passage <span id="passageNumber">1</span></h3>
+                        <div class="highlight-controls">
+                            <span style="font-size: 12px; color: #666; margin-right: 10px;">Highlight:</span>
+                            <button class="btn btn-sm highlight-btn active" data-color="yellow" title="Yellow highlight (Vàng)">
+                                🟨
+                            </button>
+                            <button class="btn btn-sm highlight-btn" data-color="green" title="Green highlight (Xanh)">
+                                🟩
+                            </button>
+                            <button class="btn btn-sm highlight-btn" data-color="blue" title="Blue highlight (Xanh dương)">
+                                🟦
+                            </button>
+                            <button class="btn btn-sm highlight-btn" data-color="pink" title="Pink highlight (Hồng)">
+                                🟪
+                            </button>
+                            <button class="btn btn-sm" id="clearHighlights" title="Clear all highlights">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding: 10px 20px; background: #f0f4ff; border-bottom: 1px solid #e0e7ff; font-size: 12px; color: #667eea;">
+                        💡 <strong>Cách highlight:</strong> Chọn màu → Drag chuột chọn text → Double-click để xóa
+                    </div>
+                    <div class="passage-content" id="passageContent">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+                </div>
+                
+                <div class="questions-panel">
+                    <div class="questions-header">
+                        <h3>Questions</h3>
+                        <span class="question-count" id="questionCount">0/0</span>
+                    </div>
+                    <div class="questions-content" id="questionsContent">
+                        <!-- Questions will be loaded dynamically -->
+                    </div>
+                    <button class="btn btn-primary btn-large" id="submitAnswers">Nộp bài</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vocabulary Tab -->
+        <section id="vocabulary" class="tab-content">
+            <div class="card">
+                <h3 class="card-title">📚 Kho từ vựng của bạn</h3>
+                <div class="vocab-controls">
+                    <input type="text" id="newWord" class="vocab-input" placeholder="Từ mới..." required>
+                    <input type="text" id="newMeaning" class="vocab-input" placeholder="Nghĩa..." required>
+                    <input type="text" id="newExample" class="vocab-input" placeholder="Ví dụ (tùy chọn)...">
+                    <button class="btn btn-primary" id="addVocabBtn">➕ Thêm từ</button>
+                </div>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="card">
+                <div class="vocab-search">
+                    <input type="text" id="searchVocab" class="vocab-input" placeholder="🔍 Tìm kiếm từ vựng...">
+                    <select id="sortVocab" class="vocab-select">
+                        <option value="newest">Mới nhất</option>
+                        <option value="oldest">Cũ nhất</option>
+                        <option value="alphabetical">A-Z</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Vocabulary List -->
+            <div class="vocab-list-container">
+                <div class="vocab-list" id="vocabList">
+                    <p class="empty-state">Chưa có từ vựng nào. Hãy thêm từ mới!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Errors Tab -->
+        <section id="errors" class="tab-content">
+            <div class="card">
+                <div class="error-header-section">
+                    <h3 class="card-title">❌ Nhật ký lỗi sai</h3>
+                    <button class="btn btn-sm btn-danger" id="clearErrors">🗑️ Xóa tất cả</button>
+                </div>
+                <div class="error-stats">
+                    <div class="error-stat-item">
+                        <span class="error-stat-value" id="totalErrors">0</span>
+                        <span class="error-stat-label">Tổng lỗi</span>
+                    </div>
+                    <div class="error-stat-item">
+                        <span class="error-stat-value" id="mostCommonError">-</span>
+                        <span class="error-stat-label">Lỗi thường gặp</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-log" id="errorLog">
+                <p class="empty-state">Chưa có lỗi nào được ghi nhận</p>
+            </div>
+        </section>
+
+        <!-- Upload Tab -->
+        <section id="upload" class="tab-content">
+            <!-- Upload Area -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 class="card-title" style="margin: 0;">📤 Upload đề thi mới</h3>
+                    <button class="btn btn-sm btn-primary" onclick="App.showExampleFormat()">
+                        📝 Xem mẫu file
+                    </button>
+                </div>
+                <p style="color: #666; margin-bottom: 15px;">
+                    Upload file JSON hoặc TXT để tự động tạo đề thi. Hệ thống sẽ parse và generate đề tự động.
+                </p>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📄</div>
+                    <p class="upload-text">Kéo thả file hoặc click để chọn</p>
+                    <p class="upload-subtext">Hỗ trợ: JSON, TXT (Max 10MB)</p>
+                    <input type="file" id="fileInput" class="file-input" accept=".json,.txt" multiple>
+                </div>
+            </div>
+
+            <!-- My Tests Library -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 class="card-title" style="margin: 0;">📚 Thư viện đề thi của tôi</h3>
+                    <button class="btn btn-sm btn-danger" onclick="App.clearAllTests()" id="clearAllTestsBtn">
+                        🗑️ Xóa tất cả
+                    </button>
+                </div>
+                <div id="testLibrary" class="test-library">
+                    <p class="empty-state">Chưa có đề thi nào. Hãy upload file để bắt đầu!</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">💾 Sao lưu dữ liệu</h3>
+                <p class="backup-description">Dữ liệu của bạn được tự động lưu sau mỗi thay đổi.</p>
+                <div class="backup-controls">
+                    <button class="btn btn-primary" id="exportDataBtn">📥 Xuất dữ liệu</button>
+                    <button class="btn btn-success" id="importDataBtn">📤 Nhập dữ liệu</button>
+                    <input type="file" id="importFile" style="display: none;" accept=".json">
+                </div>
+                <div class="backup-info">
+                    <p>Lần sao lưu cuối: <strong id="lastBackup">Chưa có</strong></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2024 IELTS Reading Practice. Made with ❤️ for learners.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/app.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/error-tracker.js"></script>
+    <script src="js/file_parser.js"></script>
+    <script src="js/practice.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/vocabulary.js"></script>
+</body>
+</html>
