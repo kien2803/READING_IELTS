@@ -7,13 +7,13 @@
 const Config = {
     // OpenAI API Configuration
     // Replace YOUR_API_KEY_HERE with your actual OpenAI API key
-    OPENAI_API_KEY: 'YOUR_API_KEY_HERE',
+    OPENAI_API_KEY: '',
     
     // API Endpoints
     OPENAI_ENDPOINT: 'https://api.openai.com/v1/chat/completions',
     
     // Model Configuration
-    AI_MODEL: 'gpt-3.5-turbo', // Or 'gpt-4' for higher quality
+    AI_MODEL: 'gpt-4', // Or 'gpt-4' for higher quality
     
     // Rate Limiting
     MAX_TOKENS: 1500,
