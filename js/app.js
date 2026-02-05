@@ -1,19 +1,18 @@
 /* ==========================================
    Main Application Controller
-   Initializes and coordinates all modules
+   IELTS Reading Practice - Road to 9.0
    ========================================== */
 
 const App = {
-    // Application state
     currentTab: 'dashboard',
     isInitialized: false,
 
     /**
-     * Initialize the entire application
+     * Initialize the application
      */
     async init() {
         console.log('🚀 Initializing IELTS Reading App...');
-
+        
         try {
             // Initialize storage first
             Storage.init();
@@ -25,6 +24,9 @@ const App = {
             // Setup event listeners
             this.setupEventListeners();
 
+            // Setup sidebar
+            this.setupSidebar();
+
             // Setup upload functionality
             this.setupUpload();
 
@@ -34,8 +36,8 @@ const App = {
             // Load initial tab
             this.switchTab('dashboard');
 
-            // Check achievements
-            Dashboard.checkAchievements();
+            // Update topbar stats
+            this.updateTopbarStats();
 
             // Mark as initialized
             this.isInitialized = true;
@@ -53,26 +55,19 @@ const App = {
      * Initialize all modules
      */
     initializeModules() {
-        // Initialize timer with 60 minutes
-        Timer.init({
-            duration: 3600,
-            warningThreshold: 300,
-            onComplete: () => {
-                Utils.showNotification('Hết giờ! Hãy nộp bài của bạn.', 'warning', 5000);
-            }
-        });
+        // Core modules
+        if (typeof Timer !== 'undefined') Timer.init();
+        if (typeof Dashboard !== 'undefined') Dashboard.init();
+        if (typeof Vocabulary !== 'undefined') Vocabulary.init();
+        if (typeof ErrorTracker !== 'undefined') ErrorTracker.init();
+        if (typeof Practice !== 'undefined') Practice.init();
 
-        // Initialize dashboard
-        Dashboard.init();
-
-        // Initialize vocabulary
-        Vocabulary.init();
-
-        // Initialize error tracker
-        ErrorTracker.init();
-
-        // Initialize practice module
-        Practice.init();
+        // New modules
+        if (typeof Library !== 'undefined') Library.init();
+        if (typeof ManualEntry !== 'undefined') ManualEntry.init();
+        if (typeof Drill !== 'undefined') Drill.renderStats();
+        if (typeof MiniTest !== 'undefined') MiniTest.renderHistory();
+        if (typeof AIAnalysis !== 'undefined') AIAnalysis.renderTypeStats();
 
         console.log('✅ All modules initialized');
     },
@@ -81,54 +76,174 @@ const App = {
      * Setup event listeners
      */
     setupEventListeners() {
-        // Tab switching
-        document.querySelectorAll('.tab-btn').forEach(btn => {
+        // Navigation items
+        document.querySelectorAll('.nav-item').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const tab = e.target.dataset.tab;
-                if (tab) {
-                    this.switchTab(tab);
-                }
+                const tab = e.currentTarget.dataset.tab;
+                if (tab) this.switchTab(tab);
             });
+        });
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.tab) {
+                this.switchTab(e.state.tab, false);
+            }
+        });
+
+        // Handle hash changes
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) this.switchTab(hash, false);
         });
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            this.handleKeyboardShortcuts(e);
+            this.handleKeyboardShortcut(e);
         });
 
-        // Window beforeunload
-        window.addEventListener('beforeunload', (e) => {
-            if (Timer.isRunning()) {
-                e.preventDefault();
-                e.returnValue = 'Bộ đếm giờ đang chạy. Bạn có chắc muốn thoát?';
+        // Check initial hash
+        const hash = window.location.hash.replace('#', '');
+        if (hash) {
+            setTimeout(() => this.switchTab(hash), 100);
+        }
+    },
+
+    /**
+     * Setup sidebar functionality
+     */
+    setupSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const toggle = document.getElementById('sidebarToggle');
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+
+        // Toggle sidebar collapse
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            });
+        }
+
+        // Mobile menu toggle
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('mobile-open');
+            });
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('mobile-open')) {
+                if (!sidebar.contains(e.target) && !mobileBtn.contains(e.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
             }
         });
 
-        // Handle visibility change (tab switching)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                console.log('App hidden');
+        // Restore sidebar state
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+        }
+
+        // Update sidebar footer with user data
+        this.updateSidebarFooter();
+    },
+
+    /**
+     * Update sidebar footer with user progress
+     */
+    updateSidebarFooter() {
+        const settings = Storage.get('settings') || {};
+        const tests = Storage.get('tests') || [];
+        
+        // Update current band
+        const bandEl = document.getElementById('currentBandSidebar');
+        if (bandEl) {
+            const avgBand = tests.length > 0
+                ? (tests.reduce((sum, t) => sum + parseFloat(t.bandScore || 0), 0) / tests.length).toFixed(1)
+                : settings.currentBand || '6.5';
+            bandEl.textContent = avgBand;
+        }
+
+        // Update streak
+        const streakEl = document.getElementById('streakCount');
+        if (streakEl) {
+            const streak = this.calculateStreak();
+            streakEl.textContent = streak;
+        }
+
+        // Update progress circle
+        this.updateProgressCircle();
+    },
+
+    /**
+     * Update progress circle in sidebar
+     */
+    updateProgressCircle() {
+        const settings = Storage.get('settings') || {};
+        const tests = Storage.get('tests') || [];
+        
+        const currentBand = tests.length > 0
+            ? tests.reduce((sum, t) => sum + parseFloat(t.bandScore || 0), 0) / tests.length
+            : parseFloat(settings.currentBand) || 6.0;
+        
+        const targetBand = parseFloat(settings.targetBand) || 8.0;
+        const startBand = parseFloat(settings.startBand) || 5.0;
+        
+        const progress = Math.min(100, Math.max(0, 
+            ((currentBand - startBand) / (targetBand - startBand)) * 100
+        ));
+
+        const progressPath = document.querySelector('.circle-progress');
+        const progressText = document.querySelector('.progress-text');
+        
+        if (progressPath) {
+            progressPath.setAttribute('stroke-dasharray', `${progress}, 100`);
+        }
+        if (progressText) {
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+    },
+
+    /**
+     * Calculate current streak
+     */
+    calculateStreak() {
+        const activities = Storage.get('activities') || [];
+        if (activities.length === 0) return 0;
+
+        let streak = 0;
+        const today = new Date().toDateString();
+        const uniqueDays = [...new Set(activities.map(a => 
+            new Date(a.timestamp).toDateString()
+        ))].sort((a, b) => new Date(b) - new Date(a));
+
+        for (let i = 0; i < uniqueDays.length; i++) {
+            const expectedDate = new Date();
+            expectedDate.setDate(expectedDate.getDate() - i);
+            
+            if (uniqueDays[i] === expectedDate.toDateString()) {
+                streak++;
             } else {
-                console.log('App visible');
-                Dashboard.refresh();
+                break;
             }
-        });
+        }
 
-        console.log('✅ Event listeners setup');
+        return streak;
     },
 
     /**
      * Switch between tabs
-     * @param {string} tabName - Tab name to switch to
      */
-    switchTab(tabName) {
+    switchTab(tabName, pushState = true) {
         // Hide all tabs
         document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.remove('active');
         });
 
-        // Remove active class from all buttons
-        document.querySelectorAll('.tab-btn').forEach(btn => {
+        // Remove active class from all nav items
+        document.querySelectorAll('.nav-item').forEach(btn => {
             btn.classList.remove('active');
         });
 
@@ -138,86 +253,156 @@ const App = {
             selectedTab.classList.add('active');
         }
 
-        // Add active class to button
-        const selectedBtn = document.querySelector(`[data-tab="${tabName}"]`);
-        if (selectedBtn) {
-            selectedBtn.classList.add('active');
+        // Add active class to nav item
+        const selectedNav = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
+        if (selectedNav) {
+            selectedNav.classList.add('active');
         }
 
         // Update current tab
         this.currentTab = tabName;
 
+        // Update breadcrumb
+        const breadcrumb = document.getElementById('currentSection');
+        if (breadcrumb) {
+            breadcrumb.textContent = this.getTabTitle(tabName);
+        }
+
         // Refresh tab content
         this.refreshTab(tabName);
 
-        // Add to history
-        if (history.pushState) {
+        // Close mobile sidebar
+        document.getElementById('sidebar')?.classList.remove('mobile-open');
+
+        // Update history
+        if (pushState && history.pushState) {
             history.pushState({ tab: tabName }, '', `#${tabName}`);
         }
     },
 
     /**
-     * Refresh specific tab content
-     * @param {string} tabName - Tab name
+     * Get human-readable tab title
+     */
+    getTabTitle(tabName) {
+        const titles = {
+            'dashboard': 'Dashboard',
+            'practice': 'Luyện tập',
+            'library': 'Thư viện đề',
+            'minitest': 'Mini-Test',
+            'drill': 'Drill Mode',
+            'vocabulary': 'Từ vựng',
+            'errors': 'Lỗi sai',
+            'aianalysis': 'AI Phân tích',
+            'upload': 'Tạo đề thi',
+            'settings': 'Cài đặt'
+        };
+        return titles[tabName] || tabName;
+    },
+
+    /**
+     * Refresh tab content
      */
     refreshTab(tabName) {
         switch (tabName) {
             case 'dashboard':
-                Dashboard.refresh();
-                break;
-            case 'vocabulary':
-                Vocabulary.filterAndSort();
-                break;
-            case 'errors':
-                ErrorTracker.render();
+                if (typeof Dashboard !== 'undefined') Dashboard.render();
                 break;
             case 'practice':
-                Practice.renderTestSelector();
+                if (typeof Practice !== 'undefined') Practice.renderTestSelector();
+                break;
+            case 'library':
+                if (typeof Library !== 'undefined') Library.render();
+                break;
+            case 'minitest':
+                if (typeof MiniTest !== 'undefined') MiniTest.renderHistory();
+                break;
+            case 'drill':
+                if (typeof Drill !== 'undefined') Drill.renderStats();
+                break;
+            case 'vocabulary':
+                if (typeof Vocabulary !== 'undefined') Vocabulary.render();
+                break;
+            case 'errors':
+                if (typeof ErrorTracker !== 'undefined') ErrorTracker.render();
+                break;
+            case 'aianalysis':
+                if (typeof AIAnalysis !== 'undefined') AIAnalysis.renderTypeStats();
                 break;
             case 'upload':
-                this.updateBackupInfo();
                 this.renderTestLibrary();
                 break;
+            case 'settings':
+                this.loadSettings();
+                break;
         }
+
+        // Update sidebar footer
+        this.updateSidebarFooter();
+    },
+
+    /**
+     * Update topbar statistics
+     */
+    updateTopbarStats() {
+        const tests = Storage.get('tests') || [];
+        const totalTime = tests.reduce((sum, t) => sum + (t.timeSpent || 0), 0);
+
+        const testsEl = document.getElementById('topbarTests');
+        const timeEl = document.getElementById('topbarTime');
+
+        if (testsEl) testsEl.textContent = tests.length;
+        if (timeEl) timeEl.textContent = Utils.secondsToHoursMinutes(totalTime);
     },
 
     /**
      * Handle keyboard shortcuts
-     * @param {KeyboardEvent} e - Keyboard event
      */
-    handleKeyboardShortcuts(e) {
-        // Ctrl/Cmd + S: Save/Export data
-        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-            e.preventDefault();
-            this.exportAllData();
-        }
+    handleKeyboardShortcut(e) {
+        // Ctrl + number for quick tab switching
+        if (e.ctrlKey && !e.shiftKey && !e.altKey) {
+            const tabMap = {
+                '1': 'dashboard',
+                '2': 'practice',
+                '3': 'library',
+                '4': 'minitest',
+                '5': 'drill',
+                '6': 'vocabulary'
+            };
 
-        // Ctrl/Cmd + K: Focus search (in vocabulary tab)
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            const searchInput = document.getElementById('searchVocab');
-            if (searchInput && this.currentTab === 'vocabulary') {
-                searchInput.focus();
+            if (tabMap[e.key]) {
+                e.preventDefault();
+                this.switchTab(tabMap[e.key]);
             }
         }
 
-        // Esc: Close modals
+        // Escape to close modals
         if (e.key === 'Escape') {
-            const modal = document.querySelector('.result-overlay');
-            if (modal) {
-                modal.remove();
-            }
+            document.querySelector('.result-overlay')?.remove();
+            document.getElementById('fullscreenMode')?.style.display === 'flex' && Practice.exitFullscreen();
+        }
+    },
+
+    /**
+     * Quick practice - random test
+     */
+    startQuickPractice() {
+        const allTests = [...FileParser.getCustomTests(), 
+            ...(typeof Library !== 'undefined' ? Library.getDefaultTests() : [])];
+        
+        if (allTests.length === 0) {
+            Utils.showNotification('Chưa có đề thi nào. Hãy tạo đề thi!', 'warning');
+            this.switchTab('upload');
+            return;
         }
 
-        // Tab shortcuts: Ctrl + 1-5
-        if (e.ctrlKey && e.key >= '1' && e.key <= '5') {
-            e.preventDefault();
-            const tabs = ['dashboard', 'practice', 'vocabulary', 'errors', 'upload'];
-            const index = parseInt(e.key) - 1;
-            if (tabs[index]) {
-                this.switchTab(tabs[index]);
+        const randomTest = allTests[Math.floor(Math.random() * allTests.length)];
+        
+        this.switchTab('practice');
+        setTimeout(() => {
+            if (typeof Practice !== 'undefined') {
+                Practice.selectTest(randomTest.id);
             }
-        }
+        }, 100);
     },
 
     /**
@@ -230,298 +415,78 @@ const App = {
         if (!uploadArea || !fileInput) return;
 
         // Click to upload
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // File selection
+        fileInput.addEventListener('change', (e) => {
+            this.handleFileUpload(e.target.files);
         });
 
         // Drag and drop
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadArea.style.borderColor = '#667eea';
-            uploadArea.style.background = '#f0f4ff';
+            uploadArea.classList.add('dragover');
         });
 
         uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '';
-            uploadArea.style.background = '';
+            uploadArea.classList.remove('dragover');
         });
 
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.style.borderColor = '';
-            uploadArea.style.background = '';
-
-            const files = e.dataTransfer.files;
-            this.handleFileUpload(files);
+            uploadArea.classList.remove('dragover');
+            this.handleFileUpload(e.dataTransfer.files);
         });
-
-        // File input change
-        fileInput.addEventListener('change', (e) => {
-            this.handleFileUpload(e.target.files);
-        });
-
-        console.log('✅ Upload functionality setup');
     },
 
     /**
      * Handle file upload
-     * @param {FileList} files - Files to upload
      */
     async handleFileUpload(files) {
-        for (const file of Array.from(files)) {
-            // Check file size (max 10MB)
-            if (file.size > 10 * 1024 * 1024) {
-                Utils.showNotification(`File "${file.name}" quá lớn (max 10MB)`, 'error');
-                continue;
-            }
-
-            // Check file type
-            const allowedTypes = ['.json', '.txt'];
-            const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-            
-            if (!allowedTypes.includes(fileExt)) {
-                Utils.showNotification(`Định dạng file không được hỗ trợ: ${fileExt}`, 'error');
-                continue;
-            }
-
-            // Try to parse as test file
+        for (const file of files) {
             try {
-                Utils.showNotification(`Đang xử lý file: ${file.name}...`, 'info', 2000);
+                const result = await FileParser.parseFile(file);
                 
-                const testData = await FileParser.parseFile(file);
-                const testId = FileParser.saveTest(testData);
-                
-                // Refresh test library display
-                this.renderTestLibrary();
-                
-                Utils.showNotification(`✅ Đã tạo đề thi: ${testData.title || file.name}`, 'success');
-
-                // Store file info in activity
-                Storage.addActivity({
-                    type: 'test_uploaded',
-                    description: `Tạo đề thi: ${testData.title || file.name}`
-                });
-
+                if (result.success) {
+                    Utils.showNotification(`✅ Đã upload: ${result.data.title}`, 'success');
+                    this.renderTestLibrary();
+                    if (typeof Library !== 'undefined') Library.render();
+                } else {
+                    Utils.showNotification(`❌ Lỗi: ${result.error}`, 'error');
+                }
             } catch (error) {
-                console.error('Parse error:', error);
-                Utils.showNotification(`❌ Không thể parse file: ${error.message}`, 'error');
+                console.error('Upload error:', error);
+                Utils.showNotification('Có lỗi khi upload file', 'error');
             }
         }
-        
-        // Clear file input
-        const fileInput = document.getElementById('fileInput');
-        if (fileInput) fileInput.value = '';
     },
 
     /**
-     * Render test library
+     * Render test library in upload tab
      */
     renderTestLibrary() {
         const container = document.getElementById('testLibrary');
         if (!container) return;
 
-        const tests = FileParser.getCustomTests();
-        
-        if (tests.length === 0) {
-            container.innerHTML = '<p class="empty-state">Chưa có đề thi nào. Hãy upload file để bắt đầu!</p>';
-            
-            // Hide clear all button
-            const clearBtn = document.getElementById('clearAllTestsBtn');
-            if (clearBtn) clearBtn.style.display = 'none';
+        const customTests = FileParser.getCustomTests();
+
+        if (customTests.length === 0) {
+            container.innerHTML = '<p class="empty-state">Chưa có đề thi nào</p>';
             return;
         }
 
-        // Show clear all button
-        const clearBtn = document.getElementById('clearAllTestsBtn');
-        if (clearBtn) clearBtn.style.display = 'block';
-
-        // Sort by creation date (newest first)
-        tests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-        container.innerHTML = tests.map(test => {
-            const totalQuestions = test.passages.reduce((sum, p) => sum + p.questions.length, 0);
-            const createdDate = new Date(test.createdAt).toLocaleDateString('vi-VN');
-            
-            return `
-                <div class="test-card" data-test-id="${test.id}">
-                    <div class="test-card-header">
-                        <h4 class="test-card-title">${test.title || 'IELTS Reading Test'}</h4>
-                        <span class="test-card-level">Band ${test.level}</span>
-                    </div>
-                    
-                    <div class="test-card-meta">
-                        <div class="test-card-meta-item">
-                            <span>📖</span>
-                            <span>${test.passages.length} passage${test.passages.length > 1 ? 's' : ''}</span>
-                        </div>
-                        <div class="test-card-meta-item">
-                            <span>❓</span>
-                            <span>${totalQuestions} questions</span>
-                        </div>
-                    </div>
-                    
-                    <div class="test-card-date">
-                        📅 Uploaded: ${createdDate}
-                    </div>
-                    
-                    <div class="test-card-actions">
-                        <button class="btn btn-success" onclick="App.startCustomTest('${test.id}')">
-                            ▶️ Bắt đầu
-                        </button>
-                        <button class="btn btn-primary" onclick="App.viewTestDetails('${test.id}')">
-                            👁️ Xem
-                        </button>
-                        <button class="btn btn-danger" onclick="App.deleteCustomTest('${test.id}')">
-                            🗑️
-                        </button>
-                    </div>
+        container.innerHTML = customTests.map(test => `
+            <div class="test-library-item">
+                <div class="test-info">
+                    <strong>${test.title}</strong>
+                    <span class="test-meta">${test.passages?.length || 0} passages • ${new Date(test.createdAt).toLocaleDateString('vi-VN')}</span>
                 </div>
-            `;
-        }).join('');
-    },
-
-    /**
-     * Start custom test
-     * @param {string} testId - Test ID
-     */
-    startCustomTest(testId) {
-        const testData = FileParser.loadCustomTest(testId);
-        if (!testData) {
-            Utils.showNotification('Không tìm thấy đề thi', 'error');
-            return;
-        }
-
-        // Switch to practice tab
-        this.switchTab('practice');
-
-        // Load custom test into practice module
-        Practice.loadCustomTest(testData);
-        
-        Utils.showNotification(`Bắt đầu: ${testData.title}`, 'success');
-    },
-
-    /**
-     * View test details
-     * @param {string} testId - Test ID
-     */
-    viewTestDetails(testId) {
-        const testData = FileParser.loadCustomTest(testId);
-        if (!testData) {
-            Utils.showNotification('Không tìm thấy đề thi', 'error');
-            return;
-        }
-
-        const totalQuestions = testData.passages.reduce((sum, p) => sum + p.questions.length, 0);
-        
-        // Group questions by type
-        const questionTypes = {};
-        testData.passages.forEach(passage => {
-            passage.questions.forEach(q => {
-                questionTypes[q.type] = (questionTypes[q.type] || 0) + 1;
-            });
-        });
-
-        const typesList = Object.entries(questionTypes)
-            .map(([type, count]) => `<li>${this.getQuestionTypeName(type)}: ${count} questions</li>`)
-            .join('');
-
-        const modal = document.createElement('div');
-        modal.className = 'result-overlay';
-        modal.innerHTML = `
-            <div class="result-modal" style="max-width: 600px; text-align: left;">
-                <h2 style="text-align: center; margin-bottom: 20px;">📋 Chi tiết đề thi</h2>
-                
-                <div style="margin-bottom: 20px;">
-                    <h3 style="color: #667eea;">${testData.title}</h3>
-                    <p style="color: #666;">Level: <strong>Band ${testData.level}</strong></p>
-                </div>
-
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="margin-bottom: 10px;">📊 Thống kê:</h4>
-                    <ul style="margin-left: 20px;">
-                        <li>Số passages: ${testData.passages.length}</li>
-                        <li>Tổng số câu hỏi: ${totalQuestions}</li>
-                        <li>Thời gian đề xuất: 60 phút</li>
-                    </ul>
-                </div>
-
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="margin-bottom: 10px;">📝 Các dạng câu hỏi:</h4>
-                    <ul style="margin-left: 20px;">
-                        ${typesList}
-                    </ul>
-                </div>
-
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="margin-bottom: 10px;">📚 Các Passages:</h4>
-                    ${testData.passages.map((p, i) => `
-                        <div style="margin-bottom: 10px;">
-                            <strong>Passage ${i + 1}:</strong> ${p.title}<br>
-                            <span style="color: #666; font-size: 13px;">${p.questions.length} questions • ${p.text.length} characters</span>
-                        </div>
-                    `).join('')}
-                </div>
-
-                <div class="result-actions">
-                    <button class="btn btn-success" onclick="App.startCustomTest('${testId}'); this.closest('.result-overlay').remove();">
-                        ▶️ Bắt đầu làm bài
-                    </button>
-                    <button class="btn btn-warning" onclick="this.closest('.result-overlay').remove()">
-                        Đóng
-                    </button>
+                <div class="test-actions">
+                    <button class="btn btn-sm btn-primary" onclick="Library.startTest('${test.id}')">▶️</button>
+                    <button class="btn btn-sm btn-danger" onclick="Library.deleteTest('${test.id}'); App.renderTestLibrary();">🗑️</button>
                 </div>
             </div>
-        `;
-
-        document.body.appendChild(modal);
-    },
-
-    /**
-     * Get question type display name
-     * @param {string} type - Question type
-     * @returns {string} Display name
-     */
-    getQuestionTypeName(type) {
-        const names = {
-            'tfng': 'True/False/Not Given',
-            'ynng': 'Yes/No/Not Given',
-            'multiple-choice': 'Multiple Choice',
-            'matching-headings': 'Matching Headings',
-            'matching-info': 'Matching Information',
-            'matching-features': 'Matching Features',
-            'summary': 'Summary Completion',
-            'sentence': 'Sentence Completion',
-            'diagram': 'Diagram Labelling'
-        };
-        return names[type] || type;
-    },
-
-    /**
-     * Delete custom test
-     * @param {string} testId - Test ID
-     */
-    deleteCustomTest(testId) {
-        if (confirm('Bạn có chắc muốn xóa đề thi này?')) {
-            FileParser.deleteCustomTest(testId);
-            this.renderTestLibrary();
-        }
-    },
-
-    /**
-     * Clear all tests
-     */
-    clearAllTests() {
-        const tests = FileParser.getCustomTests();
-        if (tests.length === 0) {
-            Utils.showNotification('Không có đề thi nào để xóa', 'info');
-            return;
-        }
-
-        if (confirm(`Bạn có chắc muốn xóa tất cả ${tests.length} đề thi?`)) {
-            Storage.set('custom_tests', []);
-            this.renderTestLibrary();
-            Utils.showNotification('Đã xóa tất cả đề thi', 'success');
-        }
+        `).join('');
     },
 
     /**
@@ -533,247 +498,205 @@ const App = {
         const importFile = document.getElementById('importFile');
 
         if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.exportAllData());
+            exportBtn.addEventListener('click', () => this.exportData());
         }
 
-        if (importBtn && importFile) {
+        if (importBtn) {
             importBtn.addEventListener('click', () => importFile.click());
+        }
+
+        if (importFile) {
             importFile.addEventListener('change', (e) => this.importData(e.target.files[0]));
         }
 
-        console.log('✅ Backup functionality setup');
+        // Update last backup time
+        this.updateLastBackupTime();
     },
 
     /**
      * Export all data
      */
-    exportAllData() {
-        const data = Storage.exportData();
-        const filename = `ielts-reading-backup-${new Date().toISOString().split('T')[0]}.json`;
-        
-        Utils.exportToJSON(data, filename);
-        this.updateBackupInfo();
-        
-        Utils.showNotification('Đã xuất dữ liệu thành công', 'success');
-
-        Storage.addActivity({
-            type: 'data_exported',
-            description: 'Xuất dữ liệu ra file'
-        });
-    },
-
-    /**
-     * Import data from file
-     * @param {File} file - JSON file to import
-     */
-    importData(file) {
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result);
-                
-                // Validate data structure
-                if (!data.userData && !data.progress) {
-                    throw new Error('Invalid data format');
-                }
-
-                // Confirm import
-                if (confirm('Nhập dữ liệu sẽ ghi đè lên dữ liệu hiện tại. Bạn có chắc chắn?')) {
-                    Storage.importData(data);
-                    
-                    // Refresh all modules
-                    Dashboard.refresh();
-                    Vocabulary.loadVocabulary();
-                    Vocabulary.filterAndSort();
-                    ErrorTracker.loadErrors();
-                    ErrorTracker.render();
-                    
-                    Utils.showNotification('Đã nhập dữ liệu thành công!', 'success');
-                    
-                    Storage.addActivity({
-                        type: 'data_imported',
-                        description: 'Nhập dữ liệu từ file'
-                    });
-                }
-            } catch (error) {
-                console.error('Import error:', error);
-                Utils.showNotification('Lỗi: File dữ liệu không hợp lệ', 'error');
-            }
+    exportData() {
+        const data = {
+            tests: Storage.get('tests') || [],
+            vocabulary: Storage.get('vocabulary') || [],
+            errors: Storage.get('errors') || [],
+            customTests: FileParser.getCustomTests(),
+            settings: Storage.get('settings') || {},
+            activities: Storage.get('activities') || [],
+            drillStats: Storage.get('drill_stats') || {},
+            minitestHistory: Storage.get('minitest_history') || [],
+            exportedAt: new Date().toISOString()
         };
 
-        reader.readAsText(file);
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ielts-reading-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+        Storage.set('lastBackup', new Date().toISOString());
+        this.updateLastBackupTime();
+        Utils.showNotification('📥 Đã xuất dữ liệu thành công!', 'success');
     },
 
     /**
-     * Update backup info display
+     * Import data from backup
      */
-    updateBackupInfo() {
-        const lastBackupEl = document.getElementById('lastBackup');
-        const backupInfo = Storage.getLastBackupInfo();
+    async importData(file) {
+        if (!file) return;
 
-        if (lastBackupEl) {
-            if (backupInfo) {
-                lastBackupEl.textContent = Utils.formatDate(backupInfo.timestamp);
-            } else {
-                lastBackupEl.textContent = 'Chưa có';
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+
+            if (confirm('Nhập dữ liệu sẽ ghi đè dữ liệu hiện tại. Bạn có chắc không?')) {
+                if (data.tests) Storage.set('tests', data.tests);
+                if (data.vocabulary) Storage.set('vocabulary', data.vocabulary);
+                if (data.errors) Storage.set('errors', data.errors);
+                if (data.settings) Storage.set('settings', data.settings);
+                if (data.activities) Storage.set('activities', data.activities);
+                if (data.drillStats) Storage.set('drill_stats', data.drillStats);
+                if (data.minitestHistory) Storage.set('minitest_history', data.minitestHistory);
+                
+                if (data.customTests) {
+                    data.customTests.forEach(test => FileParser.saveCustomTest(test));
+                }
+
+                Utils.showNotification('📤 Đã nhập dữ liệu thành công!', 'success');
+                
+                // Refresh current tab
+                this.refreshTab(this.currentTab);
+                this.updateSidebarFooter();
+                this.updateTopbarStats();
             }
+        } catch (error) {
+            console.error('Import error:', error);
+            Utils.showNotification('Có lỗi khi nhập dữ liệu', 'error');
         }
+    },
+
+    /**
+     * Update last backup time display
+     */
+    updateLastBackupTime() {
+        const el = document.getElementById('lastBackup');
+        if (!el) return;
+
+        const lastBackup = Storage.get('lastBackup');
+        el.textContent = lastBackup 
+            ? new Date(lastBackup).toLocaleString('vi-VN')
+            : 'Chưa có';
+    },
+
+    /**
+     * Load settings into form
+     */
+    loadSettings() {
+        const settings = Storage.get('settings') || {};
+
+        const currentBandEl = document.getElementById('currentBandSetting');
+        const targetBandEl = document.getElementById('targetBandSetting');
+        const apiKeyEl = document.getElementById('apiKeySetting');
+        const soundEl = document.getElementById('soundSetting');
+        const darkModeEl = document.getElementById('darkModeSetting');
+
+        if (currentBandEl) currentBandEl.value = settings.currentBand || '6.5';
+        if (targetBandEl) targetBandEl.value = settings.targetBand || '8.0';
+        if (apiKeyEl) apiKeyEl.value = Storage.get('openai_api_key') || '';
+        if (soundEl) soundEl.checked = settings.sound !== false;
+        if (darkModeEl) darkModeEl.checked = settings.darkMode !== false;
+    },
+
+    /**
+     * Clear all tests
+     */
+    clearAllTests() {
+        if (!confirm('Bạn có chắc muốn xóa TẤT CẢ đề thi đã tạo?')) return;
+
+        Storage.set('custom_tests', []);
+        Utils.showNotification('Đã xóa tất cả đề thi', 'success');
+        this.renderTestLibrary();
+        if (typeof Library !== 'undefined') Library.render();
     },
 
     /**
      * Show example file format
      */
     showExampleFormat() {
-        const modal = document.createElement('div');
-        modal.className = 'result-overlay';
-        modal.innerHTML = `
-            <div class="result-modal" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
-                <h2>📝 Hướng dẫn định dạng file</h2>
-                <div style="text-align: left; margin: 20px 0;">
-                    <h3>Format JSON:</h3>
-                    <pre style="background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px;">${this.escapeHtml(FileParser.generateExample('json'))}</pre>
-                    
-                    <h3 style="margin-top: 20px;">Format TXT:</h3>
-                    <pre style="background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px; white-space: pre-wrap;">${this.escapeHtml(FileParser.generateExample('txt'))}</pre>
-                </div>
-                <div class="result-actions">
-                    <button class="btn btn-primary" onclick="App.downloadExample('json')">
-                        📥 Tải mẫu JSON
-                    </button>
-                    <button class="btn btn-success" onclick="App.downloadExample('txt')">
-                        📥 Tải mẫu TXT
-                    </button>
-                    <button class="btn btn-warning" onclick="this.closest('.result-overlay').remove()">
-                        Đóng
-                    </button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    },
-
-    /**
-     * Escape HTML
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    },
-
-    /**
-     * Download example file
-     * @param {string} format - File format
-     */
-    downloadExample(format) {
-        const content = FileParser.generateExample(format);
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `ielts-test-example.${format}`;
-        link.click();
-        URL.revokeObjectURL(url);
-        
-        Utils.showNotification(`Đã tải file mẫu ${format.toUpperCase()}`, 'success');
-    },
-
-    /**
-     * Show app statistics
-     */
-    showStatistics() {
-        const stats = Storage.getStorageStats();
-        const performance = Dashboard.getPerformanceSummary();
-
-        console.log('=== App Statistics ===');
-        console.log('Storage:', stats);
-        console.log('Performance:', performance);
-        console.log('Current tab:', this.currentTab);
-        console.log('Initialized:', this.isInitialized);
-    },
-
-    /**
-     * Clear all app data (with confirmation)
-     */
-    clearAllData() {
-        if (!confirm('⚠️ CẢNH BÁO: Hành động này sẽ XÓA TẤT CẢ dữ liệu của bạn và không thể hoàn tác. Bạn có chắc chắn?')) {
-            return;
-        }
-
-        if (!confirm('Bạn có thực sự chắc chắn? Hãy xác nhận lần nữa để xóa tất cả dữ liệu.')) {
-            return;
-        }
-
-        Storage.clear();
-        Storage.initializeDefaultData();
-        
-        // Reload page
-        location.reload();
-    },
-
-    /**
-     * Get app version and info
-     * @returns {Object} App info
-     */
-    getAppInfo() {
-        return {
-            name: 'IELTS Reading Practice',
-            version: '1.0.0',
-            build: '2024.01.16',
-            author: 'IELTS Learning Team',
-            initialized: this.isInitialized,
-            currentTab: this.currentTab
-        };
-    },
-
-    /**
-     * Handle browser back/forward
-     */
-    handlePopState() {
-        window.addEventListener('popstate', (e) => {
-            if (e.state && e.state.tab) {
-                this.switchTab(e.state.tab);
-            } else {
-                // Get tab from URL hash
-                const hash = window.location.hash.substring(1);
-                if (hash) {
-                    this.switchTab(hash);
+        const example = {
+            title: "Cambridge IELTS 17 - Test 1",
+            source: "cambridge",
+            level: "7.5",
+            passages: [
+                {
+                    title: "The Voyage of the Beagle",
+                    text: "Nội dung passage ở đây...",
+                    questions: [
+                        {
+                            type: "tfng",
+                            text: "Darwin was born in England.",
+                            answer: "True",
+                            explanation: "Giải thích..."
+                        }
+                    ]
                 }
-            }
-        });
+            ]
+        };
+
+        const blob = new Blob([JSON.stringify(example, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'example-format.json';
+        a.click();
+
+        URL.revokeObjectURL(url);
+        Utils.showNotification('📥 Đã tải file mẫu', 'success');
     }
 };
 
-// Initialize app when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => App.init());
-} else {
-    App.init();
-}
+// Settings module
+const Settings = {
+    save() {
+        const settings = {
+            currentBand: document.getElementById('currentBandSetting')?.value || '6.5',
+            targetBand: document.getElementById('targetBandSetting')?.value || '8.0',
+            sound: document.getElementById('soundSetting')?.checked ?? true,
+            darkMode: document.getElementById('darkModeSetting')?.checked ?? true
+        };
 
-// Handle browser history
-App.handlePopState();
+        Storage.set('settings', settings);
 
-// Make App available globally for debugging
-window.App = App;
+        // Save API key separately
+        const apiKey = document.getElementById('apiKeySetting')?.value;
+        if (apiKey) {
+            Storage.set('openai_api_key', apiKey);
+        }
 
-// Add console welcome message
-console.log('%c🎯 IELTS Reading - Road to 9.0', 'color: #667eea; font-size: 20px; font-weight: bold;');
-console.log('%cVersion 1.0.0', 'color: #666; font-size: 12px;');
-console.log('%cType App.showStatistics() to view stats', 'color: #999; font-size: 11px;');
-
-// Export for development/debugging
-window.IELTS = {
-    App,
-    Storage,
-    Timer,
-    Vocabulary,
-    ErrorTracker,
-    Practice,
-    Dashboard,
-    Utils
+        Utils.showNotification('✅ Đã lưu cài đặt!', 'success');
+        
+        // Update UI
+        App.updateSidebarFooter();
+        
+        // Update target band display
+        const targetDisplay = document.getElementById('targetBandDisplay');
+        if (targetDisplay) targetDisplay.textContent = settings.targetBand;
+    }
 };
+
+// Make Settings available globally
+window.Settings = Settings;
+
+// Initialize app when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+});
+
+// Make App available globally
+window.App = App;
