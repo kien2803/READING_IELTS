@@ -1,6 +1,7 @@
 /* ==========================================
    Storage Management Module
    Handles all data persistence operations
+   Uses localStorage for permanent data storage
    ========================================== */
 
 const Storage = {
@@ -13,13 +14,28 @@ const Storage = {
         SETTINGS: 'ielts_settings',
         ACTIVITIES: 'ielts_activities',
         TESTS: 'ielts_tests',
-        LAST_BACKUP: 'ielts_last_backup'
+        CUSTOM_TESTS: 'ielts_custom_tests',
+        LAST_BACKUP: 'ielts_last_backup',
+        LAST_SAVE: 'ielts_last_save'
     },
+
+    // Autosave status
+    lastSaveTime: null,
+    saveQueue: [],
+    isSaving: false,
 
     /**
      * Initialize storage with default data
      */
     init() {
+        console.log('📦 Initializing Storage with localStorage...');
+        
+        // Check if localStorage is available
+        if (!this.isLocalStorageAvailable()) {
+            console.warn('⚠️ localStorage không khả dụng, dữ liệu sẽ không được lưu!');
+            Utils.showNotification('Trình duyệt không hỗ trợ lưu dữ liệu vĩnh viễn', 'warning');
+        }
+        
         // Check if this is first time user
         if (!this.get(this.KEYS.USER_DATA)) {
             this.initializeDefaultData();
@@ -27,6 +43,26 @@ const Storage = {
         
         // Auto backup every 5 minutes
         setInterval(() => this.autoBackup(), 5 * 60 * 1000);
+        
+        // Show last save time
+        this.lastSaveTime = this.get(this.KEYS.LAST_SAVE);
+        if (this.lastSaveTime) {
+            console.log(`📅 Lần lưu cuối: ${new Date(this.lastSaveTime).toLocaleString('vi-VN')}`);
+        }
+    },
+    
+    /**
+     * Check if localStorage is available
+     */
+    isLocalStorageAvailable() {
+        try {
+            const test = '__storage_test__';
+            localStorage.setItem(test, test);
+            localStorage.removeItem(test);
+            return true;
+        } catch (e) {
+            return false;
+        }
     },
 
     /**
@@ -93,28 +129,77 @@ const Storage = {
     set(key, value) {
         try {
             const data = JSON.stringify(value);
-            window[`storage_${key}`] = data;
+            localStorage.setItem(key, data);
+            
+            // Update last save time
+            this.lastSaveTime = new Date().toISOString();
+            localStorage.setItem(this.KEYS.LAST_SAVE, JSON.stringify(this.lastSaveTime));
+            
+            // Show autosave indicator
+            this.showSaveIndicator();
+            
             return true;
         } catch (error) {
             console.error('Storage set error:', error);
-            Utils.showNotification('Lỗi khi lưu dữ liệu', 'error');
+            
+            // Check if quota exceeded
+            if (error.name === 'QuotaExceededError') {
+                Utils.showNotification('Bộ nhớ đầy! Hãy xóa bớt dữ liệu cũ.', 'error');
+            } else {
+                Utils.showNotification('Lỗi khi lưu dữ liệu', 'error');
+            }
             return false;
         }
     },
 
     /**
-     * Retrieve data from memory storage
+     * Retrieve data from localStorage
      * @param {string} key - Storage key
      * @returns {*} Retrieved value or null
      */
     get(key) {
         try {
-            const data = window[`storage_${key}`];
+            const data = localStorage.getItem(key);
             return data ? JSON.parse(data) : null;
         } catch (error) {
             console.error('Storage get error:', error);
             return null;
         }
+    },
+    
+    /**
+     * Show autosave indicator
+     */
+    showSaveIndicator() {
+        // Create or update save indicator
+        let indicator = document.getElementById('autosaveIndicator');
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.id = 'autosaveIndicator';
+            indicator.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                padding: 8px 16px;
+                background: rgba(40, 167, 69, 0.9);
+                color: white;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                z-index: 9999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(indicator);
+        }
+        
+        indicator.textContent = '💾 Đã lưu tự động';
+        indicator.style.opacity = '1';
+        
+        setTimeout(() => {
+            indicator.style.opacity = '0';
+        }, 1500);
     },
 
     /**
@@ -124,7 +209,7 @@ const Storage = {
      */
     remove(key) {
         try {
-            delete window[`storage_${key}`];
+            localStorage.removeItem(key);
             return true;
         } catch (error) {
             console.error('Storage remove error:', error);

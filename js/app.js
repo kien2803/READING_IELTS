@@ -469,24 +469,41 @@ const App = {
         if (!container) return;
 
         const customTests = FileParser.getCustomTests();
+        const storageInfo = FileParser.getStorageInfo();
+
+        // Show storage stats header
+        let html = `
+            <div class="library-stats-bar">
+                <span class="stat-item">📚 ${storageInfo.totalTests} đề thi</span>
+                <span class="stat-item">📖 ${storageInfo.totalPassages} passages</span>
+                <span class="stat-item">❓ ${storageInfo.totalQuestions} câu hỏi</span>
+                <span class="stat-item autosave-indicator">💾 Autosave: ON</span>
+            </div>
+        `;
 
         if (customTests.length === 0) {
-            container.innerHTML = '<p class="empty-state">Chưa có đề thi nào</p>';
-            return;
+            html += '<p class="empty-state">Chưa có đề thi nào. Upload file hoặc tạo thủ công!</p>';
+        } else {
+            html += customTests.map(test => {
+                const questionCount = test.passages?.reduce((sum, p) => sum + (p.questions?.length || 0), 0) || 0;
+                const lastModified = test.lastModified ? new Date(test.lastModified).toLocaleString('vi-VN') : 'N/A';
+                
+                return `
+                <div class="test-library-item">
+                    <div class="test-info">
+                        <strong>${test.title}</strong>
+                        <span class="test-meta">${test.passages?.length || 0} passages • ${questionCount} câu • Band ${test.level || '7.0'}</span>
+                        <span class="test-date">📅 ${lastModified}</span>
+                    </div>
+                    <div class="test-actions">
+                        <button class="btn btn-sm btn-primary" onclick="Library.startTest('${test.id}')" title="Bắt đầu làm bài">▶️</button>
+                        <button class="btn btn-sm btn-danger" onclick="Library.deleteTest('${test.id}'); App.renderTestLibrary();" title="Xóa đề thi">🗑️</button>
+                    </div>
+                </div>
+            `}).join('');
         }
 
-        container.innerHTML = customTests.map(test => `
-            <div class="test-library-item">
-                <div class="test-info">
-                    <strong>${test.title}</strong>
-                    <span class="test-meta">${test.passages?.length || 0} passages • ${new Date(test.createdAt).toLocaleDateString('vi-VN')}</span>
-                </div>
-                <div class="test-actions">
-                    <button class="btn btn-sm btn-primary" onclick="Library.startTest('${test.id}')">▶️</button>
-                    <button class="btn btn-sm btn-danger" onclick="Library.deleteTest('${test.id}'); App.renderTestLibrary();">🗑️</button>
-                </div>
-            </div>
-        `).join('');
+        container.innerHTML = html;
     },
 
     /**

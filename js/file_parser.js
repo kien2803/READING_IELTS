@@ -1,26 +1,57 @@
 /* ==========================================
    File Parser Module
    Parse uploaded files to generate tests
+   With automatic save functionality
    ========================================== */
 
 const FileParser = {
     /**
-     * Parse uploaded file and generate test
+     * Parse uploaded file and automatically save to storage
      * @param {File} file - Uploaded file
-     * @returns {Promise} Parsed test data
+     * @returns {Promise<Object>} Result with success status and data
      */
     async parseFile(file) {
         const extension = file.name.split('.').pop().toLowerCase();
-
-        switch (extension) {
-            case 'json':
-                return await this.parseJSON(file);
-            case 'txt':
-                return await this.parseTXT(file);
-            case 'docx':
-                return await this.parseDOCX(file);
-            default:
-                throw new Error('Unsupported file format');
+        
+        try {
+            let data;
+            
+            switch (extension) {
+                case 'json':
+                    data = await this.parseJSON(file);
+                    break;
+                case 'txt':
+                    data = await this.parseTXT(file);
+                    break;
+                case 'docx':
+                    data = await this.parseDOCX(file);
+                    break;
+                default:
+                    return { success: false, error: 'Định dạng file không được hỗ trợ' };
+            }
+            
+            // Add default title if missing
+            if (!data.title) {
+                data.title = file.name.replace(/\.[^/.]+$/, '');
+            }
+            
+            // Auto-save the test
+            const testId = this.saveTest(data);
+            
+            console.log(`📁 File parsed and saved: ${file.name} -> ${testId}`);
+            
+            return { 
+                success: true, 
+                data: { ...data, id: testId },
+                message: `Đã lưu đề thi "${data.title}" thành công!`
+            };
+            
+        } catch (error) {
+            console.error('Parse file error:', error);
+            return { 
+                success: false, 
+                error: error.message || 'Lỗi khi đọc file'
+            };
         }
     },
 
@@ -353,24 +384,73 @@ E3: The passage mentions coffee was known in Persia, Egypt, Syria, and Turkey by
     /**
      * Save parsed test to storage
      * @param {Object} testData - Parsed test data
+     * @returns {string} Test ID
      */
     saveTest(testData) {
         // Generate unique ID
         const testId = Utils.generateId();
         
         // Store in custom tests
-        const customTests = Storage.get('custom_tests') || [];
-        customTests.push({
+        const customTests = Storage.get(Storage.KEYS.CUSTOM_TESTS) || [];
+        const newTest = {
             id: testId,
             ...testData,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            lastModified: new Date().toISOString()
+        };
+        
+        customTests.push(newTest);
+        Storage.set(Storage.KEYS.CUSTOM_TESTS, customTests);
+        
+        // Add activity log
+        Storage.addActivity({
+            type: 'test_uploaded',
+            description: `Đã upload đề thi "${testData.title || 'Untitled'}" với ${testData.passages?.length || 0} passages`,
+            testId: testId
         });
         
-        Storage.set('custom_tests', customTests);
-        
-        Utils.showNotification('Đã tạo đề thi mới thành công!', 'success');
+        Utils.showNotification('✅ Đã tạo và autosave đề thi thành công!', 'success');
+        console.log(`📚 Test saved: ${testId}`, newTest);
         
         return testId;
+    },
+
+    /**
+     * Save custom test (from ManualEntry)
+     * @param {Object} testData - Test data
+     */
+    saveCustomTest(testData) {
+        const customTests = Storage.get(Storage.KEYS.CUSTOM_TESTS) || [];
+        
+        // Check if updating existing test
+        const existingIndex = customTests.findIndex(t => t.id === testData.id);
+        
+        if (existingIndex >= 0) {
+            // Update existing
+            customTests[existingIndex] = {
+                ...customTests[existingIndex],
+                ...testData,
+                lastModified: new Date().toISOString()
+            };
+        } else {
+            // Add new
+            customTests.push({
+                ...testData,
+                createdAt: new Date().toISOString(),
+                lastModified: new Date().toISOString()
+            });
+        }
+        
+        Storage.set(Storage.KEYS.CUSTOM_TESTS, customTests);
+        
+        // Add activity log
+        Storage.addActivity({
+            type: 'test_created',
+            description: `Đã tạo đề thi "${testData.title}"`,
+            testId: testData.id
+        });
+        
+        console.log(`📚 Custom test saved: ${testData.id}`);
     },
 
     /**
@@ -378,7 +458,7 @@ E3: The passage mentions coffee was known in Persia, Egypt, Syria, and Turkey by
      * @returns {Array} Custom tests
      */
     getCustomTests() {
-        return Storage.get('custom_tests') || [];
+        return Storage.get(Storage.KEYS.CUSTOM_TESTS) || [];
     },
 
     /**
@@ -397,9 +477,32 @@ E3: The passage mentions coffee was known in Persia, Egypt, Syria, and Turkey by
      */
     deleteCustomTest(testId) {
         const tests = this.getCustomTests();
+        const testToDelete = tests.find(t => t.id === testId);
         const filtered = tests.filter(t => t.id !== testId);
-        Storage.set('custom_tests', filtered);
+        Storage.set(Storage.KEYS.CUSTOM_TESTS, filtered);
+        
+        // Add activity log
+        Storage.addActivity({
+            type: 'test_deleted',
+            description: `Đã xóa đề thi "${testToDelete?.title || testId}"`
+        });
+        
         Utils.showNotification('Đã xóa đề thi', 'success');
+    },
+    
+    /**
+     * Get storage usage info
+     * @returns {Object} Storage info
+     */
+    getStorageInfo() {
+        const tests = this.getCustomTests();
+        return {
+            totalTests: tests.length,
+            totalPassages: tests.reduce((sum, t) => sum + (t.passages?.length || 0), 0),
+            totalQuestions: tests.reduce((sum, t) => 
+                sum + (t.passages?.reduce((ps, p) => ps + (p.questions?.length || 0), 0) || 0), 0
+            )
+        };
     }
 };
 

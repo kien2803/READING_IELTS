@@ -410,6 +410,113 @@ const Vocabulary = {
         return this.currentList.find(v => 
             Utils.normalizeText(v.word) === Utils.normalizeText(word)
         );
+    },
+
+    /**
+     * Export vocabulary to JSON file
+     */
+    exportVocabulary() {
+        const data = {
+            vocabulary: this.currentList,
+            exportedAt: new Date().toISOString(),
+            totalWords: this.currentList.length
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `vocabulary-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+        Utils.showNotification(`✅ Đã xuất ${this.currentList.length} từ vựng`, 'success');
+    },
+
+    /**
+     * Import vocabulary from JSON file
+     * @param {File} file - JSON file to import
+     */
+    async importVocabulary(file) {
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+
+            let importedWords = [];
+            
+            if (Array.isArray(data)) {
+                importedWords = data;
+            } else if (data.vocabulary && Array.isArray(data.vocabulary)) {
+                importedWords = data.vocabulary;
+            } else {
+                throw new Error('Invalid vocabulary file format');
+            }
+
+            let addedCount = 0;
+            let duplicateCount = 0;
+
+            importedWords.forEach(word => {
+                // Check for duplicates
+                const exists = this.currentList.find(v =>
+                    Utils.normalizeText(v.word) === Utils.normalizeText(word.word)
+                );
+
+                if (!exists && word.word && word.meaning) {
+                    Storage.addVocabulary({
+                        word: word.word,
+                        meaning: word.meaning,
+                        example: word.example || '',
+                        phonetic: word.phonetic || '',
+                        category: word.category || 'imported',
+                        masteryLevel: word.masteryLevel || 0,
+                        reviewCount: word.reviewCount || 0,
+                        lastReviewed: null
+                    });
+                    addedCount++;
+                } else {
+                    duplicateCount++;
+                }
+            });
+
+            this.loadVocabulary();
+            this.filterAndSort();
+
+            Utils.showNotification(
+                `✅ Đã import ${addedCount} từ mới${duplicateCount > 0 ? `, ${duplicateCount} từ đã tồn tại` : ''}`,
+                'success'
+            );
+
+            Storage.addActivity({
+                type: 'vocab_imported',
+                description: `Import ${addedCount} từ vựng từ file`
+            });
+
+        } catch (error) {
+            console.error('Import error:', error);
+            Utils.showNotification('❌ Lỗi khi import file từ vựng', 'error');
+        }
+    },
+
+    /**
+     * Clear all vocabulary (with confirmation)
+     */
+    clearAll() {
+        if (!confirm('Bạn có chắc muốn xóa TẤT CẢ từ vựng? Hành động này không thể hoàn tác.')) {
+            return;
+        }
+
+        Storage.set(Storage.KEYS.VOCABULARY, []);
+        this.loadVocabulary();
+        this.filterAndSort();
+
+        Utils.showNotification('Đã xóa tất cả từ vựng', 'success');
+
+        Storage.addActivity({
+            type: 'vocab_cleared',
+            description: 'Xóa tất cả từ vựng'
+        });
     }
 };
 
