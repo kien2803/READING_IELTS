@@ -89,6 +89,15 @@ const Utils = {
     },
 
     /**
+     * Alias for shuffleArray
+     * @param {Array} array - Array to shuffle
+     * @returns {Array} Shuffled array
+     */
+    shuffle(array) {
+        return this.shuffleArray(array);
+    },
+
+    /**
      * Debounce function to limit function calls
      * @param {Function} func - Function to debounce
      * @param {number} wait - Wait time in milliseconds
