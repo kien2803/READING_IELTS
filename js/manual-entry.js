@@ -48,7 +48,7 @@ const ManualEntry = {
     },
 
     /**
-     * Switch upload method (manual/file)
+     * Switch upload method (manual/file/ai-generator)
      */
     switchMethod(method) {
         document.querySelectorAll('.method-tab').forEach(tab => {
@@ -59,7 +59,15 @@ const ManualEntry = {
             content.classList.remove('active');
         });
 
-        const targetSection = method === 'manual' ? 'manualEntrySection' : 'fileUploadSection';
+        let targetSection;
+        if (method === 'manual') {
+            targetSection = 'manualEntrySection';
+        } else if (method === 'upload') {
+            targetSection = 'fileUploadSection';
+        } else if (method === 'ai-generator') {
+            targetSection = 'aiGeneratorSection';
+        }
+
         const section = document.getElementById(targetSection);
         if (section) {
             section.classList.add('active');

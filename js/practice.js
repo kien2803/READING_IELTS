@@ -88,9 +88,15 @@ const Practice = {
     },
 
     /**
-     * Get sample tests
+     * Get sample tests - use Library's default tests for consistency
      */
     getSampleTests() {
+        // Use Library's default tests if available
+        if (typeof Library !== 'undefined' && Library.getDefaultTests) {
+            return Library.getDefaultTests();
+        }
+        
+        // Fallback to basic sample test
         return [
             {
                 id: 'sample-coffee',
@@ -132,27 +138,52 @@ These coffee houses quickly became centers of social activity and communication 
     },
 
     /**
-     * Select test - improved UX
+     * Select test - improved UX with better test lookup
      */
     selectTest(testId) {
         this.selectedTestId = testId;
         
-        // Load test data
-        if (testId.startsWith('sample-')) {
-            this.selectedTestData = this.getSampleTests().find(t => t.id === testId);
-        } else {
-            this.selectedTestData = FileParser.loadCustomTest(testId);
+        // Try to find test from various sources
+        let testData = null;
+        
+        // 1. Check Library's default tests first
+        if (typeof Library !== 'undefined') {
+            const defaultTests = Library.getDefaultTests();
+            testData = defaultTests.find(t => t.id === testId);
         }
+        
+        // 2. Check custom/uploaded tests
+        if (!testData) {
+            testData = FileParser.loadCustomTest(testId);
+        }
+        
+        // 3. Fallback to Practice's sample tests
+        if (!testData) {
+            const sampleTests = this.getSampleTests();
+            testData = sampleTests.find(t => t.id === testId);
+        }
+        
+        if (!testData) {
+            Utils.showNotification('❌ Không tìm thấy đề thi!', 'error');
+            console.error('Test not found:', testId);
+            return;
+        }
+        
+        this.selectedTestData = testData;
 
         // Update UI
         document.querySelectorAll('.test-selector-card').forEach(card => {
             card.classList.remove('selected');
+            card.classList.remove('active');
         });
         const selectedCard = document.querySelector(`[data-test-id="${testId}"]`);
         if (selectedCard) {
             selectedCard.classList.add('active');
             selectedCard.classList.add('selected');
         }
+
+        // Update question types grid for this test
+        this.updateQuestionTypesForTest();
 
         // Show config section with animation
         const configSection = document.getElementById('testConfigSection');
@@ -161,6 +192,7 @@ These coffee houses quickly became centers of social activity and communication 
             setTimeout(() => configSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
 
+        console.log('Selected test:', testData);
         Utils.showNotification(`✅ Đã chọn: ${this.selectedTestData.title}`, 'success', 2000);
     },
 
@@ -509,19 +541,36 @@ These coffee houses quickly became centers of social activity and communication 
             timerSection.style.display = 'block';
         }
 
+        // Show practice area container
+        const practiceArea = document.getElementById('practiceArea');
+        if (practiceArea) {
+            practiceArea.style.display = 'block';
+        }
+
         // Show passage container
         const passageContainer = document.getElementById('passageContainer');
         if (passageContainer) {
             passageContainer.style.display = 'grid';
         }
 
+        // Hide test selector and config
+        const testSelector = document.querySelector('.test-selector-grid')?.closest('.card');
+        if (testSelector) {
+            testSelector.style.display = 'none';
+        }
+        const configSection = document.getElementById('testConfigSection');
+        if (configSection) {
+            configSection.style.display = 'none';
+        }
+
         // Reset and start timer
         Timer.reset();
+        Timer.start();
         this.startTime = Date.now();
 
-        // Scroll to passage
+        // Scroll to practice area
         setTimeout(() => {
-            Utils.scrollToElement('#passageContainer', 80);
+            Utils.scrollToElement('#practiceArea', 80);
         }, 100);
     },
 
@@ -952,6 +1001,136 @@ Keep it concise, practical, and encouraging.`;
             'diagram': 'Diagram Labelling'
         };
         return names[type] || type;
+    },
+
+    /**
+     * Start practice with selected test - CRITICAL MISSING FUNCTION
+     */
+    startSelectedTest() {
+        if (!this.selectedTestData) {
+            Utils.showNotification('⚠️ Vui lòng chọn đề thi trước!', 'warning');
+            return;
+        }
+
+        // Get timer mode
+        const timerMode = document.querySelector('input[name="timerMode"]:checked')?.value || 'standard';
+        
+        // Set timer based on mode
+        if (typeof Timer !== 'undefined') {
+            switch (timerMode) {
+                case 'standard':
+                    Timer.setDuration(60 * 60); // 60 minutes
+                    break;
+                case 'relaxed':
+                    Timer.setDuration(90 * 60); // 90 minutes
+                    break;
+                case 'unlimited':
+                    Timer.setDuration(0); // No limit
+                    break;
+            }
+        }
+
+        // Start full test
+        this.startFullTest();
+        
+        Utils.showNotification(`🚀 Bắt đầu ${this.selectedTestData.title}!`, 'success');
+    },
+
+    /**
+     * Start fullscreen mode - CRITICAL MISSING FUNCTION
+     */
+    startFullscreen() {
+        if (!this.selectedTestData) {
+            Utils.showNotification('⚠️ Vui lòng chọn đề thi trước!', 'warning');
+            return;
+        }
+
+        // Try to use FullscreenPractice module if available
+        if (typeof FullscreenPractice !== 'undefined') {
+            FullscreenPractice.start(this.selectedTestData);
+        } else {
+            // Fallback: Enter browser fullscreen and start normal practice
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().then(() => {
+                    this.startSelectedTest();
+                }).catch(err => {
+                    console.log('Fullscreen error:', err);
+                    this.startSelectedTest();
+                });
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+                this.startSelectedTest();
+            } else {
+                // Fullscreen not supported, just start normally
+                this.startSelectedTest();
+            }
+        }
+    },
+
+    /**
+     * Update question types grid based on selected test
+     */
+    updateQuestionTypesForTest() {
+        if (!this.selectedTestData || !this.selectedTestData.passages) return;
+
+        const grid = document.getElementById('questionTypesGrid');
+        if (!grid) return;
+
+        // Get all unique question types in the test
+        const types = new Set();
+        this.selectedTestData.passages.forEach(passage => {
+            passage.questions.forEach(q => {
+                types.add(q.type);
+            });
+        });
+
+        // Always include full-test option
+        const typeCards = [{
+            type: 'full-test',
+            icon: '📝',
+            name: 'Full Test',
+            desc: 'Làm toàn bộ đề'
+        }];
+
+        // Add available types
+        types.forEach(type => {
+            const typeInfo = this.getQuestionTypeInfo(type);
+            if (typeInfo) {
+                typeCards.push(typeInfo);
+            }
+        });
+
+        grid.innerHTML = typeCards.map(t => `
+            <div class="question-type-card" data-type="${t.type}" onclick="Practice.selectQuestionType('${t.type}')">
+                <span class="type-icon">${t.icon}</span>
+                <span class="type-name">${t.name}</span>
+                <span class="type-desc">${t.desc}</span>
+            </div>
+        `).join('');
+
+        // Update selected test name display
+        const nameDisplay = document.getElementById('selectedTestName');
+        if (nameDisplay) {
+            nameDisplay.textContent = this.selectedTestData.title;
+        }
+    },
+
+    /**
+     * Get question type info
+     */
+    getQuestionTypeInfo(type) {
+        const types = {
+            'tfng': { type: 'tfng', icon: '✓✗', name: 'True/False/NG', desc: 'Xác định thông tin đúng/sai' },
+            'ynng': { type: 'ynng', icon: '👍👎', name: 'Yes/No/NG', desc: 'Xác định quan điểm tác giả' },
+            'multiple-choice': { type: 'multiple-choice', icon: 'ABCD', name: 'Multiple Choice', desc: 'Chọn đáp án đúng' },
+            'summary': { type: 'summary', icon: '📝', name: 'Summary', desc: 'Điền từ vào tóm tắt' },
+            'sentence': { type: 'sentence', icon: '✏️', name: 'Sentence Completion', desc: 'Hoàn thành câu' },
+            'matching-headings': { type: 'matching-headings', icon: '🔗', name: 'Matching Headings', desc: 'Ghép tiêu đề đoạn văn' },
+            'matching-info': { type: 'matching-info', icon: '📌', name: 'Matching Info', desc: 'Ghép thông tin với đoạn' },
+            'diagram': { type: 'diagram', icon: '📊', name: 'Diagram', desc: 'Điền vào sơ đồ' }
+        };
+        return types[type] || null;
     },
 
     /**

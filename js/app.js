@@ -65,6 +65,8 @@ const App = {
         // New modules
         if (typeof Library !== 'undefined') Library.init();
         if (typeof ManualEntry !== 'undefined') ManualEntry.init();
+        if (typeof AIProvider !== 'undefined') AIProvider.init();
+        if (typeof AITestGenerator !== 'undefined') AITestGenerator.init();
         if (typeof Drill !== 'undefined') Drill.renderStats();
         if (typeof MiniTest !== 'undefined') MiniTest.renderHistory();
         if (typeof AIAnalysis !== 'undefined') AIAnalysis.renderTypeStats();

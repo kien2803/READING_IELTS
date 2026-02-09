@@ -38,7 +38,19 @@ const Drill = {
      * Get all questions of a specific type
      */
     getQuestionsOfType(type) {
-        const allTests = [...FileParser.getCustomTests(), ...this.getSampleDrillQuestions()];
+        // Get tests from all sources
+        let allTests = [...this.getSampleDrillQuestions()];
+        
+        // Add custom tests
+        if (typeof FileParser !== 'undefined') {
+            allTests = [...allTests, ...FileParser.getCustomTests()];
+        }
+        
+        // Add library default tests
+        if (typeof Library !== 'undefined' && Library.getDefaultTests) {
+            allTests = [...allTests, ...Library.getDefaultTests()];
+        }
+        
         const questions = [];
 
         allTests.forEach(test => {
@@ -61,30 +73,118 @@ const Drill = {
     },
 
     /**
-     * Sample drill questions
+     * Sample drill questions - comprehensive question bank for all types
      */
     getSampleDrillQuestions() {
-        return [{
-            id: 'drill-sample-1',
-            passages: [{
-                title: 'The Digital Revolution',
-                text: `The digital revolution has transformed nearly every aspect of modern life. From how we communicate and work to how we shop and entertain ourselves, digital technology has become deeply embedded in our daily routines.
+        return [
+            {
+                id: 'drill-sample-digital',
+                passages: [{
+                    title: 'The Digital Revolution',
+                    text: `The digital revolution has transformed nearly every aspect of modern life. From how we communicate and work to how we shop and entertain ourselves, digital technology has become deeply embedded in our daily routines.
 
 One of the most significant changes has been in the workplace. Remote work, once considered unusual, has become commonplace for millions of workers worldwide. Video conferencing tools have replaced many face-to-face meetings, while cloud computing has made it possible to access work files from anywhere in the world.
 
 The education sector has also undergone dramatic changes. Online learning platforms have made education accessible to people who might otherwise not have the opportunity to study. Students can now take courses from prestigious universities without leaving their homes.
 
 However, the digital revolution has also raised concerns about privacy, mental health, and the growing digital divide between those who have access to technology and those who do not.`,
-                questions: [
-                    { id: 'dr1', type: 'tfng', text: 'Remote work was common before the digital revolution.', answer: 'False', explanation: 'The passage states remote work was "once considered unusual".' },
-                    { id: 'dr2', type: 'tfng', text: 'Cloud computing allows people to access files from anywhere.', answer: 'True', explanation: 'The passage explicitly states this.' },
-                    { id: 'dr3', type: 'tfng', text: 'All universities now offer online courses.', answer: 'Not Given', explanation: 'The passage mentions online courses from "prestigious universities" but does not say all universities offer them.' },
-                    { id: 'dr4', type: 'ynng', text: 'The author believes the digital revolution has been entirely positive.', answer: 'No', explanation: 'The author mentions concerns about privacy, mental health, and digital divide.' },
-                    { id: 'dr5', type: 'multiple-choice', text: 'What has replaced many face-to-face meetings?', answer: 'Video conferencing tools', options: ['Email', 'Video conferencing tools', 'Phone calls', 'Text messages'], explanation: 'The passage states video conferencing tools have replaced many face-to-face meetings.' },
-                    { id: 'dr6', type: 'summary', text: 'The digital revolution has made _______ accessible to more people.', answer: 'education', wordLimit: 1, explanation: 'The passage discusses how online learning has made education accessible.' }
-                ]
-            }]
-        }];
+                    questions: [
+                        { id: 'dr1', type: 'tfng', text: 'Remote work was common before the digital revolution.', answer: 'False', explanation: 'The passage states remote work was "once considered unusual".' },
+                        { id: 'dr2', type: 'tfng', text: 'Cloud computing allows people to access files from anywhere.', answer: 'True', explanation: 'The passage explicitly states this.' },
+                        { id: 'dr3', type: 'tfng', text: 'All universities now offer online courses.', answer: 'Not Given', explanation: 'The passage mentions online courses from "prestigious universities" but does not say all universities offer them.' },
+                        { id: 'dr4', type: 'ynng', text: 'The author believes the digital revolution has been entirely positive.', answer: 'No', explanation: 'The author mentions concerns about privacy, mental health, and digital divide.' },
+                        { id: 'dr5', type: 'multiple-choice', text: 'What has replaced many face-to-face meetings?', answer: 'Video conferencing tools', options: ['Email', 'Video conferencing tools', 'Phone calls', 'Text messages'], explanation: 'The passage states video conferencing tools have replaced many face-to-face meetings.' },
+                        { id: 'dr6', type: 'summary', text: 'The digital revolution has made _______ accessible to more people.', answer: 'education', wordLimit: 1, explanation: 'The passage discusses how online learning has made education accessible.' }
+                    ]
+                }]
+            },
+            {
+                id: 'drill-sample-environment',
+                passages: [{
+                    title: 'Renewable Energy Transition',
+                    text: `The global transition to renewable energy is accelerating faster than many experts predicted. Solar and wind power have become the cheapest sources of new electricity generation in most parts of the world. In 2022, renewable energy sources accounted for nearly 30% of global electricity production.
+
+Many countries have set ambitious targets for carbon neutrality. The European Union aims to be carbon neutral by 2050, while China has pledged to achieve this goal by 2060. These commitments are driving massive investments in clean energy infrastructure.
+
+However, the transition faces significant challenges. The intermittent nature of solar and wind power requires improved energy storage solutions. Additionally, the mining of minerals needed for batteries and solar panels raises environmental and ethical concerns.
+
+Despite these challenges, the economic case for renewable energy continues to strengthen. The cost of solar panels has dropped by 90% over the past decade, making clean energy increasingly competitive with fossil fuels.`,
+                    questions: [
+                        { id: 'dr7', type: 'tfng', text: 'Renewable energy is now the cheapest option for new electricity in most regions.', answer: 'True', explanation: 'The passage states solar and wind have become the cheapest sources in most parts of the world.' },
+                        { id: 'dr8', type: 'tfng', text: 'China plans to achieve carbon neutrality before the EU.', answer: 'False', explanation: 'EU aims for 2050, China for 2060.' },
+                        { id: 'dr9', type: 'tfng', text: 'Solar panel production has no environmental impact.', answer: 'False', explanation: 'The passage mentions "environmental and ethical concerns" about mining for batteries and solar panels.' },
+                        { id: 'dr10', type: 'summary', text: 'Renewables accounted for nearly _______% of global electricity in 2022.', answer: '30', wordLimit: 1, explanation: 'The passage states "nearly 30% of global electricity production".' },
+                        { id: 'dr11', type: 'multiple-choice', text: 'By how much have solar panel costs decreased in the past decade?', answer: '90%', options: ['50%', '70%', '90%', '30%'], explanation: 'The passage states costs dropped by 90%.' },
+                        { id: 'dr12', type: 'ynng', text: 'The author is optimistic about the future of renewable energy.', answer: 'Yes', explanation: 'The passage ends on a positive note about economics strengthening.' }
+                    ]
+                }]
+            },
+            {
+                id: 'drill-sample-psychology',
+                passages: [{
+                    title: 'The Psychology of Decision Making',
+                    text: `Human decision-making is far less rational than we might assume. Psychologists have identified numerous cognitive biases that influence our choices, often without our awareness.
+
+A. Confirmation bias leads us to seek information that supports our existing beliefs while ignoring contradictory evidence. This can reinforce misconceptions and prevent us from changing our minds even when presented with new facts.
+
+B. The anchoring effect causes us to rely too heavily on the first piece of information we encounter. For example, in negotiations, the initial offer serves as an anchor that influences all subsequent discussions.
+
+C. Loss aversion describes our tendency to prefer avoiding losses over acquiring equivalent gains. Research suggests that the pain of losing is psychologically about twice as powerful as the pleasure of gaining.
+
+D. Understanding these biases can help us make better decisions. By being aware of our cognitive tendencies, we can implement strategies to counteract them, such as actively seeking out opposing viewpoints or using decision-making frameworks.`,
+                    questions: [
+                        { id: 'dr13', type: 'matching-headings', text: 'Which paragraph discusses how first impressions affect negotiations?', answer: 'B', options: ['A', 'B', 'C', 'D'], explanation: 'Paragraph B discusses anchoring effect and negotiations.' },
+                        { id: 'dr14', type: 'matching-headings', text: 'Which paragraph explains why we avoid changing our beliefs?', answer: 'A', options: ['A', 'B', 'C', 'D'], explanation: 'Paragraph A discusses confirmation bias.' },
+                        { id: 'dr15', type: 'tfng', text: 'Humans naturally make rational decisions.', answer: 'False', explanation: 'The passage states decision-making is "far less rational than we might assume".' },
+                        { id: 'dr16', type: 'tfng', text: 'Losing feels worse than gaining feels good.', answer: 'True', explanation: 'The passage states "the pain of losing is psychologically about twice as powerful as the pleasure of gaining".' },
+                        { id: 'dr17', type: 'summary', text: 'The _______ effect causes us to rely too heavily on first information.', answer: 'anchoring', wordLimit: 1, explanation: 'The passage discusses "the anchoring effect".' },
+                        { id: 'dr18', type: 'sentence', text: 'One strategy to counteract biases is to actively seek out opposing _______.', answer: 'viewpoints', wordLimit: 1, explanation: 'The passage mentions "actively seeking out opposing viewpoints".' }
+                    ]
+                }]
+            },
+            {
+                id: 'drill-sample-health',
+                passages: [{
+                    title: 'The Mediterranean Diet',
+                    text: `The Mediterranean diet has been recognized as one of the healthiest eating patterns in the world. Based on the traditional foods of countries bordering the Mediterranean Sea, this diet emphasizes plant-based foods, healthy fats, and moderate consumption of fish and poultry.
+
+Key components include olive oil as the primary fat source, abundant fruits and vegetables, whole grains, legumes, and nuts. Red meat is consumed sparingly, typically only a few times per month. Moderate wine consumption, usually with meals, is also characteristic of this dietary pattern.
+
+Research has consistently shown that following a Mediterranean diet reduces the risk of cardiovascular disease, type 2 diabetes, and certain cancers. A landmark study published in the New England Journal of Medicine found that people following this diet had a 30% lower risk of heart attacks and strokes.
+
+The diet's benefits extend beyond physical health. Studies suggest it may also protect against cognitive decline and depression, likely due to its anti-inflammatory effects and high content of antioxidants.`,
+                    questions: [
+                        { id: 'dr19', type: 'tfng', text: 'The Mediterranean diet focuses mainly on meat consumption.', answer: 'False', explanation: 'The diet emphasizes plant-based foods, with red meat consumed sparingly.' },
+                        { id: 'dr20', type: 'tfng', text: 'Olive oil is the main source of fat in this diet.', answer: 'True', explanation: 'The passage states olive oil is "the primary fat source".' },
+                        { id: 'dr21', type: 'tfng', text: 'Alcohol is completely forbidden in the Mediterranean diet.', answer: 'False', explanation: 'The passage mentions "moderate wine consumption".' },
+                        { id: 'dr22', type: 'multiple-choice', text: 'By how much can the Mediterranean diet reduce heart attack risk?', answer: '30%', options: ['10%', '20%', '30%', '50%'], explanation: 'The passage cites a study showing 30% lower risk.' },
+                        { id: 'dr23', type: 'summary', text: 'The diet may protect against cognitive decline due to its anti-_______ effects.', answer: 'inflammatory', wordLimit: 1, explanation: 'The passage mentions "anti-inflammatory effects".' },
+                        { id: 'dr24', type: 'ynng', text: 'The author considers the Mediterranean diet beneficial for mental health.', answer: 'Yes', explanation: 'The passage mentions protection against cognitive decline and depression.' }
+                    ]
+                }]
+            },
+            {
+                id: 'drill-sample-history',
+                passages: [{
+                    title: 'The Industrial Revolution',
+                    text: `The Industrial Revolution, which began in Britain in the late 18th century, fundamentally transformed human society. What started as technological innovations in textile manufacturing spread to other industries and eventually to countries around the world.
+
+The invention of the steam engine by James Watt in 1769 was a pivotal moment. This new source of power enabled factories to operate independently of water sources, allowing industrial centers to develop anywhere. Steam power also revolutionized transportation through railways and steamships.
+
+The social consequences were profound. Millions of people migrated from rural areas to cities in search of factory work. Working conditions were often harsh, with long hours, dangerous machinery, and no labor protections. Child labor was common.
+
+However, the Industrial Revolution also brought significant improvements in living standards over time. Mass production made goods more affordable, technological innovations improved healthcare, and rising wealth eventually led to better working conditions and the expansion of education.`,
+                    questions: [
+                        { id: 'dr25', type: 'tfng', text: 'The Industrial Revolution started in France.', answer: 'False', explanation: 'The passage states it began in Britain.' },
+                        { id: 'dr26', type: 'tfng', text: 'James Watt invented the steam engine in 1769.', answer: 'True', explanation: 'The passage explicitly states this.' },
+                        { id: 'dr27', type: 'tfng', text: 'Factory working conditions were immediately good.', answer: 'False', explanation: 'The passage describes conditions as "often harsh".' },
+                        { id: 'dr28', type: 'sentence', text: 'Steam power allowed factories to operate without depending on _______ sources.', answer: 'water', wordLimit: 1, explanation: 'The passage states factories could operate "independently of water sources".' },
+                        { id: 'dr29', type: 'multiple-choice', text: 'What industry first saw innovations during the Industrial Revolution?', answer: 'Textile manufacturing', options: ['Mining', 'Textile manufacturing', 'Steel production', 'Agriculture'], explanation: 'The passage mentions "textile manufacturing" as where it started.' },
+                        { id: 'dr30', type: 'ynng', text: 'The author views the Industrial Revolution as having mixed effects.', answer: 'Yes', explanation: 'The passage discusses both negative consequences and improvements.' }
+                    ]
+                }]
+            }
+        ];
     },
 
     /**
