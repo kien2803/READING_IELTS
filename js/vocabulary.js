@@ -4,12 +4,30 @@
    ========================================== */
 
 const Vocabulary = {
+    // Available topics for categorization
+    TOPICS: {
+        'general': { name: 'Tổng quát', icon: '📝', color: '#6366f1' },
+        'education': { name: 'Giáo dục', icon: '🎓', color: '#3b82f6' },
+        'environment': { name: 'Môi trường', icon: '🌱', color: '#10b981' },
+        'technology': { name: 'Công nghệ', icon: '💻', color: '#8b5cf6' },
+        'health': { name: 'Sức khỏe', icon: '🏥', color: '#ef4444' },
+        'business': { name: 'Kinh doanh', icon: '💼', color: '#f59e0b' },
+        'culture': { name: 'Văn hóa', icon: '🎭', color: '#ec4899' },
+        'science': { name: 'Khoa học', icon: '🔬', color: '#06b6d4' },
+        'society': { name: 'Xã hội', icon: '👥', color: '#84cc16' },
+        'travel': { name: 'Du lịch', icon: '✈️', color: '#14b8a6' },
+        'sport': { name: 'Thể thao', icon: '⚽', color: '#f97316' },
+        'art': { name: 'Nghệ thuật', icon: '🎨', color: '#a855f7' },
+        'media': { name: 'Truyền thông', icon: '📺', color: '#0ea5e9' }
+    },
+
     // Current state
     currentList: [],
     filteredList: [],
     searchQuery: '',
     sortOrder: 'newest',
-    selectedCategory: 'all',
+    selectedTopic: 'all',
+    groupByTopic: false,
 
     /**
      * Initialize vocabulary module
@@ -48,6 +66,24 @@ const Vocabulary = {
             });
         }
 
+        // Topic filter
+        const topicFilter = document.getElementById('topicFilter');
+        if (topicFilter) {
+            topicFilter.addEventListener('change', (e) => {
+                this.selectedTopic = e.target.value;
+                this.filterAndSort();
+            });
+        }
+
+        // Group by topic toggle
+        const groupToggle = document.getElementById('groupByTopic');
+        if (groupToggle) {
+            groupToggle.addEventListener('change', (e) => {
+                this.groupByTopic = e.target.checked;
+                this.render();
+            });
+        }
+
         // Enter key to add vocabulary
         const inputs = ['newWord', 'newMeaning', 'newExample'];
         inputs.forEach(id => {
@@ -77,6 +113,7 @@ const Vocabulary = {
         const wordInput = document.getElementById('newWord');
         const meaningInput = document.getElementById('newMeaning');
         const exampleInput = document.getElementById('newExample');
+        const topicSelect = document.getElementById('newTopic');
 
         if (!wordInput || !meaningInput) return;
 
@@ -108,12 +145,14 @@ const Vocabulary = {
         }
 
         // Create vocabulary object
+        const topic = topicSelect ? topicSelect.value : 'general';
         const vocab = {
             word: word,
             meaning: meaning,
             example: example,
             phonetic: '',
-            category: 'general',
+            topic: topic,
+            category: topic, // Keep for backward compatibility
             masteryLevel: 0,
             reviewCount: 0,
             lastReviewed: null
@@ -181,8 +220,15 @@ const Vocabulary = {
      * Filter and sort vocabulary list
      */
     filterAndSort() {
-        // Filter by search query
+        // Filter by topic and search query
         this.filteredList = this.currentList.filter(vocab => {
+            // Filter by topic
+            if (this.selectedTopic !== 'all') {
+                const vocabTopic = vocab.topic || vocab.category || 'general';
+                if (vocabTopic !== this.selectedTopic) return false;
+            }
+            
+            // Filter by search query
             if (!this.searchQuery) return true;
             
             const query = Utils.normalizeText(this.searchQuery);
@@ -226,7 +272,68 @@ const Vocabulary = {
             return;
         }
 
-        container.innerHTML = this.filteredList.map(vocab => `
+        if (this.groupByTopic) {
+            this.renderGroupedByTopic(container);
+        } else {
+            this.renderList(container);
+        }
+        
+        // Update statistics
+        this.updateTopicStats();
+    },
+
+    /**
+     * Render flat list of vocabulary
+     */
+    renderList(container) {
+        container.innerHTML = this.filteredList.map(vocab => this.createVocabCard(vocab)).join('');
+    },
+
+    /**
+     * Render vocabulary grouped by topic
+     */
+    renderGroupedByTopic(container) {
+        // Group vocabulary by topic
+        const grouped = {};
+        this.filteredList.forEach(vocab => {
+            const topic = vocab.topic || vocab.category || 'general';
+            if (!grouped[topic]) {
+                grouped[topic] = [];
+            }
+            grouped[topic].push(vocab);
+        });
+
+        // Render each group
+        let html = '';
+        Object.keys(grouped).sort().forEach(topic => {
+            const topicInfo = this.TOPICS[topic] || this.TOPICS['general'];
+            const words = grouped[topic];
+            
+            html += `
+                <div class="vocab-topic-group" style="border-left: 3px solid ${topicInfo.color}">
+                    <div class="topic-group-header">
+                        <span class="topic-icon">${topicInfo.icon}</span>
+                        <h3 class="topic-name">${topicInfo.name}</h3>
+                        <span class="topic-count">${words.length} từ</span>
+                    </div>
+                    <div class="topic-group-content">
+                        ${words.map(vocab => this.createVocabCard(vocab)).join('')}
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    },
+
+    /**
+     * Create vocabulary card HTML
+     */
+    createVocabCard(vocab) {
+        const topic = vocab.topic || vocab.category || 'general';
+        const topicInfo = this.TOPICS[topic] || this.TOPICS['general'];
+        
+        return `
             <div class="vocab-item" data-id="${vocab.id}">
                 <div class="vocab-content">
                     <div class="vocab-word">
@@ -236,6 +343,7 @@ const Vocabulary = {
                     <div class="vocab-meaning">${vocab.meaning}</div>
                     ${vocab.example ? `<div class="vocab-example">${vocab.example}</div>` : ''}
                     <div class="vocab-tags">
+                        ${this.getTopicTag(topic, topicInfo)}
                         ${this.getMasteryTag(vocab.masteryLevel)}
                         <span class="vocab-tag">${Utils.formatDateShort(vocab.createdAt)}</span>
                     </div>
@@ -249,7 +357,17 @@ const Vocabulary = {
                     </button>
                 </div>
             </div>
-        `).join('');
+        `;
+    },
+
+    /**
+     * Get topic tag HTML
+     */
+    getTopicTag(topic, topicInfo) {
+        if (this.groupByTopic) return ''; // Don't show topic tag if already grouped
+        return `<span class="vocab-tag topic-tag" style="background: ${topicInfo.color}20; color: ${topicInfo.color}">
+            ${topicInfo.icon} ${topicInfo.name}
+        </span>`;
     },
 
     /**
@@ -517,6 +635,42 @@ const Vocabulary = {
             type: 'vocab_cleared',
             description: 'Xóa tất cả từ vựng'
         });
+    },
+
+    /**
+     * Update topic statistics
+     */
+    updateTopicStats() {
+        const statsContainer = document.getElementById('topicStatsContainer');
+        if (!statsContainer) return;
+
+        // Count vocabulary by topic
+        const topicCounts = {};
+        this.currentList.forEach(vocab => {
+            const topic = vocab.topic || vocab.category || 'general';
+            topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+        });
+
+        // Create stats HTML
+        const statsHTML = Object.entries(topicCounts)
+            .sort((a, b) => b[1] - a[1]) // Sort by count descending
+            .map(([topic, count]) => {
+                const topicInfo = this.TOPICS[topic] || this.TOPICS['general'];
+                const percentage = (count / this.currentList.length * 100).toFixed(0);
+                return `
+                    <div class="topic-stat-item" style="border-left-color: ${topicInfo.color}">
+                        <span class="topic-stat-icon">${topicInfo.icon}</span>
+                        <span class="topic-stat-name">${topicInfo.name}</span>
+                        <div class="topic-stat-bar">
+                            <div class="topic-stat-fill" style="width: ${percentage}%; background: ${topicInfo.color}"></div>
+                        </div>
+                        <span class="topic-stat-count">${count}</span>
+                    </div>
+                `;
+            })
+            .join('');
+
+        statsContainer.innerHTML = statsHTML || '<p class="empty-state">Chưa có thống kê</p>';
     }
 };
 

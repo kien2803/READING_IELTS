@@ -70,6 +70,10 @@ const App = {
         if (typeof Drill !== 'undefined') Drill.renderStats();
         if (typeof MiniTest !== 'undefined') MiniTest.renderHistory();
         if (typeof AIAnalysis !== 'undefined') AIAnalysis.renderTypeStats();
+        
+        // Vocabulary learning modules
+        if (typeof Flashcard !== 'undefined') Flashcard.init();
+        if (typeof VocabQuiz !== 'undefined') VocabQuiz.init();
 
         console.log('✅ All modules initialized');
     },

@@ -610,6 +610,33 @@
                         <p class="section-subtitle">Quản lý và ôn tập từ vựng IELTS</p>
                     </div>
 
+                    <!-- Learning Modes -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>🎯 Chế độ học</h3>
+                        </div>
+                        <div class="vocab-quick-actions">
+                            <button class="vocab-mode-btn" onclick="Flashcard.start('all')">
+                                🎴 Flashcard - Tất cả từ
+                            </button>
+                            <button class="vocab-mode-btn" onclick="Flashcard.start('new')">
+                                ✨ Flashcard - Từ mới
+                            </button>
+                            <button class="vocab-mode-btn" onclick="Flashcard.start('weak')">
+                                💪 Flashcard - Từ yếu
+                            </button>
+                            <button class="vocab-mode-btn" onclick="VocabQuiz.start('multiple-choice', 10)">
+                                📝 Quiz - Trắc nghiệm (10 câu)
+                            </button>
+                            <button class="vocab-mode-btn" onclick="VocabQuiz.start('typing', 10)">
+                                ✍️ Quiz - Tự luận (10 câu)
+                            </button>
+                            <button class="vocab-mode-btn" onclick="VocabQuiz.start('mixed', 15)">
+                                🎲 Quiz - Hỗn hợp (15 câu)
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="card">
                         <div class="card-header">
                             <h3>➕ Thêm từ mới</h3>
@@ -618,6 +645,21 @@
                             <input type="text" id="newWord" class="input" placeholder="Từ vựng..." required>
                             <input type="text" id="newMeaning" class="input" placeholder="Nghĩa..." required>
                             <input type="text" id="newExample" class="input" placeholder="Ví dụ (tùy chọn)...">
+                            <select id="newTopic" class="select">
+                                <option value="general">📝 Tổng quát</option>
+                                <option value="education">🎓 Giáo dục</option>
+                                <option value="environment">🌱 Môi trường</option>
+                                <option value="technology">💻 Công nghệ</option>
+                                <option value="health">🏥 Sức khỏe</option>
+                                <option value="business">💼 Kinh doanh</option>
+                                <option value="culture">🎭 Văn hóa</option>
+                                <option value="science">🔬 Khoa học</option>
+                                <option value="society">👥 Xã hội</option>
+                                <option value="travel">✈️ Du lịch</option>
+                                <option value="sport">⚽ Thể thao</option>
+                                <option value="art">🎨 Nghệ thuật</option>
+                                <option value="media">📺 Truyền thông</option>
+                            </select>
                             <button class="btn btn-primary" id="addVocabBtn">➕ Thêm</button>
                         </div>
                     </div>
@@ -628,11 +670,43 @@
                         </div>
                         <div class="vocab-search-bar">
                             <input type="text" id="searchVocab" class="input" placeholder="🔍 Tìm kiếm từ vựng...">
+                            <select id="topicFilter" class="select">
+                                <option value="all">📚 Tất cả chủ đề</option>
+                                <option value="general">📝 Tổng quát</option>
+                                <option value="education">🎓 Giáo dục</option>
+                                <option value="environment">🌱 Môi trường</option>
+                                <option value="technology">💻 Công nghệ</option>
+                                <option value="health">🏥 Sức khỏe</option>
+                                <option value="business">💼 Kinh doanh</option>
+                                <option value="culture">🎭 Văn hóa</option>
+                                <option value="science">🔬 Khoa học</option>
+                                <option value="society">👥 Xã hội</option>
+                                <option value="travel">✈️ Du lịch</option>
+                                <option value="sport">⚽ Thể thao</option>
+                                <option value="art">🎨 Nghệ thuật</option>
+                                <option value="media">📺 Truyền thông</option>
+                            </select>
                             <select id="sortVocab" class="select">
                                 <option value="newest">Mới nhất</option>
                                 <option value="oldest">Cũ nhất</option>
                                 <option value="alphabetical">A-Z</option>
                             </select>
+                        </div>
+                        <div class="vocab-display-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="groupByTopic">
+                                <span>📂 Nhóm theo chủ đề</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Topic Statistics -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📊 Thống kê theo chủ đề</h3>
+                        </div>
+                        <div class="topic-stats-container" id="topicStatsContainer">
+                            <p class="empty-state">Chưa có thống kê</p>
                         </div>
                     </div>
 
@@ -1234,6 +1308,7 @@ VD: Copy từ sách, báo, website về chủ đề academic như khoa học, l�
 
     <!-- JavaScript Files -->
     <script src="js/config.js"></script>
+    <script src="js/notification.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/timer.js"></script>
@@ -1241,6 +1316,9 @@ VD: Copy từ sách, báo, website về chủ đề academic như khoa học, l�
     <script src="js/dashboard.js"></script>
     <script src="js/practice.js"></script>
     <script src="js/vocabulary.js"></script>
+    <script src="js/flashcard.js"></script>
+    <script src="js/vocab-quiz.js"></script>
+    <script src="js/text-selector.js"></script>
     <script src="js/error-tracker.js"></script>
     <script src="js/minitest.js"></script>
     <script src="js/drill.js"></script>

@@ -43,16 +43,37 @@ const Timer = {
         const pauseBtn = document.getElementById('pauseTimer');
         const resetBtn = document.getElementById('resetTimer');
 
+        console.log('🔧 Timer binding events:', {
+            startBtn: !!startBtn,
+            pauseBtn: !!pauseBtn,
+            resetBtn: !!resetBtn
+        });
+
         if (startBtn) {
-            startBtn.addEventListener('click', () => this.start());
+            startBtn.addEventListener('click', () => {
+                console.log('▶️ Timer start clicked');
+                this.start();
+            });
+        } else {
+            console.warn('⚠️ Timer start button not found');
         }
 
         if (pauseBtn) {
-            pauseBtn.addEventListener('click', () => this.pause());
+            pauseBtn.addEventListener('click', () => {
+                console.log('⏸️ Timer pause clicked');
+                this.pause();
+            });
+        } else {
+            console.warn('⚠️ Timer pause button not found');
         }
 
         if (resetBtn) {
-            resetBtn.addEventListener('click', () => this.reset());
+            resetBtn.addEventListener('click', () => {
+                console.log('🔄 Timer reset clicked');
+                this.reset();
+            });
+        } else {
+            console.warn('⚠️ Timer reset button not found');
         }
     },
 

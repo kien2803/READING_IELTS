@@ -23,6 +23,7 @@ const Storage = {
     lastSaveTime: null,
     saveQueue: [],
     isSaving: false,
+    saveIndicatorTimeout: null,
 
     /**
      * Initialize storage with default data
@@ -171,6 +172,11 @@ const Storage = {
      * Show autosave indicator
      */
     showSaveIndicator() {
+        // Clear existing timeout to debounce
+        if (this.saveIndicatorTimeout) {
+            clearTimeout(this.saveIndicatorTimeout);
+        }
+
         // Create or update save indicator
         let indicator = document.getElementById('autosaveIndicator');
         if (!indicator) {
@@ -197,7 +203,8 @@ const Storage = {
         indicator.textContent = '💾 Đã lưu tự động';
         indicator.style.opacity = '1';
         
-        setTimeout(() => {
+        // Use debounce - only hide after 1.5s of no more saves
+        this.saveIndicatorTimeout = setTimeout(() => {
             indicator.style.opacity = '0';
         }, 1500);
     },

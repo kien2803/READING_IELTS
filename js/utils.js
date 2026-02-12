@@ -139,18 +139,22 @@ const Utils = {
      * @param {number} duration - Duration in milliseconds
      */
     showNotification(message, type = 'info', duration = 3000) {
-        // Remove existing notifications
+        // Use new Notification system if available
+        if (window.Notification && window.Notification.show) {
+            window.Notification.show(message, type, duration);
+            return;
+        }
+
+        // Fallback to simple notification
         const existing = document.querySelector('.notification-toast');
         if (existing) {
             existing.remove();
         }
 
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification-toast notification-${type}`;
         notification.textContent = message;
 
-        // Add styles
         notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -166,7 +170,6 @@ const Utils = {
             font-weight: 500;
         `;
 
-        // Set color based on type
         const colors = {
             success: '#28a745',
             error: '#dc3545',
@@ -175,10 +178,8 @@ const Utils = {
         };
         notification.style.borderLeft = `4px solid ${colors[type] || colors.info}`;
 
-        // Add to document
         document.body.appendChild(notification);
 
-        // Remove after duration
         setTimeout(() => {
             notification.style.animation = 'slideOutRight 0.3s ease-out';
             setTimeout(() => notification.remove(), 300);
