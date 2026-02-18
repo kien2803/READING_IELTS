@@ -37,6 +37,16 @@ const Dashboard = {
         this.renderWeaknesses();
         this.renderActivities();
         this.renderStreak();
+        
+        // Initialize charts if available
+        if (typeof DashboardCharts !== 'undefined') {
+            setTimeout(() => DashboardCharts.init(), 100);
+        }
+        
+        // Initialize adaptive difficulty if available
+        if (typeof AdaptiveDifficulty !== 'undefined') {
+            AdaptiveDifficulty.init();
+        }
     },
 
     /**

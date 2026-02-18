@@ -62,7 +62,7 @@ const MiniTest = {
                             filteredQuestions.push({
                                 ...q,
                                 passageTitle: passage.title,
-                                passageText: passage.text.substring(0, 500)
+                                passageText: passage.text  // Full text, not truncated
                             });
                         }
                     });
@@ -180,6 +180,9 @@ const MiniTest = {
         const container = document.getElementById('minitest');
         if (!container) return;
 
+        // Group questions by passage
+        const passages = this.groupQuestionsByPassage();
+
         container.innerHTML = `
             <div class="section-header">
                 <h2>⏱️ Mini-Test: ${this.getModeTitle(this.currentMode)}</h2>
@@ -195,13 +198,55 @@ const MiniTest = {
                     <button class="btn btn-danger" onclick="MiniTest.submit()">📤 Nộp bài</button>
                 </div>
 
-                <div class="minitest-questions" id="minitestQuestions">
-                    ${this.questions.map((q, i) => this.renderQuestion(q, i)).join('')}
+                <div class="minitest-content">
+                    ${passages.map(passage => this.renderPassageBlock(passage)).join('')}
                 </div>
             </div>
         `;
 
         this.bindEvents();
+    },
+
+    /**
+     * Group questions by passage
+     */
+    groupQuestionsByPassage() {
+        const passageMap = new Map();
+        
+        this.questions.forEach(q => {
+            const title = q.passageTitle || 'Reading Passage';
+            if (!passageMap.has(title)) {
+                passageMap.set(title, {
+                    title: title,
+                    text: q.passageText || '',
+                    questions: []
+                });
+            }
+            passageMap.get(title).questions.push(q);
+        });
+        
+        return Array.from(passageMap.values());
+    },
+
+    /**
+     * Render passage with its questions
+     */
+    renderPassageBlock(passage) {
+        return `
+            <div class="minitest-passage-block">
+                <div class="minitest-passage">
+                    <div class="passage-header">
+                        <h3>📖 ${passage.title}</h3>
+                    </div>
+                    <div class="passage-text">
+                        ${passage.text || 'Read the passage carefully...'}
+                    </div>
+                </div>
+                <div class="minitest-questions" id="minitestQuestions">
+                    ${passage.questions.map((q, i) => this.renderQuestion(q, this.questions.indexOf(q))).join('')}
+                </div>
+            </div>
+        `;
     },
 
     /**

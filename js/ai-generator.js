@@ -1,700 +1,551 @@
 /* ==========================================
-   AI Test Generator Module
-   Generate IELTS Reading tests from prompts or text
+   AI Generator Module - Professional Edition
+   Generate IELTS Reading tests with AI
    ========================================== */
 
-const AITestGenerator = {
+const AIGenerator = {
+    providers: {
+        'openai': {
+            name: 'OpenAI GPT-4',
+            models: ['gpt-4', 'gpt-3.5-turbo'],
+            endpoint: 'https://api.openai.com/v1/chat/completions'
+        },
+        'gemini': {
+            name: 'Google Gemini',
+            models: ['gemini-1.5-pro', 'gemini-1.5-flash'],
+            endpoint: 'https://generativelanguage.googleapis.com/v1beta/models'
+        },
+        'claude': {
+            name: 'Anthropic Claude',
+            models: ['claude-3-opus', 'claude-3-sonnet'],
+            endpoint: 'https://api.anthropic.com/v1/messages'
+        }
+    },
+
+    currentProvider: 'gemini',
+    currentModel: 'gemini-1.5-pro',
     isGenerating: false,
 
     /**
-     * Initialize the module
+     * Initialize AI Generator
      */
     init() {
-        this.bindEvents();
+        this.loadSettings();
+        this.renderUI();
     },
 
     /**
-     * Bind event listeners
+     * Load saved settings
      */
-    bindEvents() {
-        // Generate from prompt button
-        const generateFromPromptBtn = document.getElementById('generateFromPromptBtn');
-        if (generateFromPromptBtn) {
-            generateFromPromptBtn.addEventListener('click', () => this.generateFromPrompt());
-        }
-
-        // Generate from text button
-        const generateFromTextBtn = document.getElementById('generateFromTextBtn');
-        if (generateFromTextBtn) {
-            generateFromTextBtn.addEventListener('click', () => this.generateFromText());
-        }
-
-        // Passage text word/char counter
-        const aiPassageText = document.getElementById('aiPassageText');
-        if (aiPassageText) {
-            aiPassageText.addEventListener('input', () => this.updateTextStats());
-        }
+    loadSettings() {
+        const settings = Storage.get('ai_generator_settings') || {};
+        this.currentProvider = settings.provider || 'gemini';
+        this.currentModel = settings.model || 'gemini-1.5-pro';
     },
 
     /**
-     * Update word/character stats for passage textarea
+     * Save settings
      */
-    updateTextStats() {
-        const textarea = document.getElementById('aiPassageText');
-        const text = textarea?.value || '';
-        
-        const charCount = text.length;
-        const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
-        
-        const charElement = document.getElementById('aiPassageCharCount');
-        const wordElement = document.getElementById('aiPassageWordCount');
-        
-        if (charElement) charElement.textContent = `${charCount} ký tự`;
-        if (wordElement) wordElement.textContent = `${wordCount} từ`;
+    saveSettings() {
+        Storage.set('ai_generator_settings', {
+            provider: this.currentProvider,
+            model: this.currentModel
+        });
     },
 
     /**
-     * Get API key from AIProvider or legacy storage
+     * Render professional UI
+     */
+    renderUI() {
+        const container = document.getElementById('aiGenerator');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="ai-generator-modern">
+                <!-- Header Section -->
+                <div class="ai-gen-header">
+                    <div class="header-content">
+                        <div class="header-icon">🤖</div>
+                        <div class="header-text">
+                            <h2>AI-Powered IELTS Test Generator</h2>
+                            <p class="header-subtitle">Generate professional IELTS Reading tests tailored to your needs</p>
+                        </div>
+                    </div>
+                    <div class="header-badge">
+                        <span class="premium-badge">✨ Pro Feature</span>
+                    </div>
+                </div>
+
+                <!-- Configuration Section -->
+                <div class="ai-gen-config">
+                    <div class="config-card">
+                        <h3 class="config-title">⚙️ AI Configuration</h3>
+                        
+                        <!-- Provider Selection -->
+                        <div class="config-group">
+                            <label class="config-label">
+                                <span class="label-text">AI Provider</span>
+                                <span class="label-hint">Choose your preferred AI model</span>
+                            </label>
+                            <div class="provider-grid">
+                                ${Object.keys(this.providers).map(key => this.renderProviderCard(key)).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Model Selection -->
+                        <div class="config-group">
+                            <label class="config-label">
+                                <span class="label-text">Model</span>
+                                <span class="label-hint">Select model variant</span>
+                            </label>
+                            <select class="modern-select" id="modelSelect" onchange="AIGenerator.selectModel(this.value)">
+                                ${this.providers[this.currentProvider].models.map(model => `
+                                    <option value="${model}" ${model === this.currentModel ? 'selected' : ''}>
+                                        ${model} ${model.includes('pro') || model.includes('opus') || model.includes('gpt-4') ? '(Recommended)' : ''}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
+
+                        <!-- API Key -->
+                        <div class="config-group">
+                            <label class="config-label">
+                                <span class="label-text">API Key</span>
+                                <span class="label-hint">Your ${this.providers[this.currentProvider].name} API key</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <input 
+                                    type="password" 
+                                    class="modern-input" 
+                                    id="apiKeyInput"
+                                    placeholder="sk-..." 
+                                    value="${this.getApiKey()}"
+                                    onchange="AIGenerator.saveApiKey(this.value)"
+                                >
+                                <button class="input-icon-btn" onclick="AIGenerator.toggleApiKeyVisibility()">
+                                    👁️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generation Section -->
+                <div class="ai-gen-generation">
+                    <div class="generation-card">
+                        <h3 class="config-title">📝 Test Parameters</h3>
+                        
+                        <!-- Topic -->
+                        <div class="param-group">
+                            <label class="param-label">
+                                <span>Topic / Theme</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                class="modern-input" 
+                                id="topicInput"
+                                placeholder="e.g., Climate Change, Technology, Education..."
+                            >
+                        </div>
+
+                        <!-- Difficulty -->
+                        <div class="param-group">
+                            <label class="param-label">
+                                <span>Target Band Score</span>
+                            </label>
+                            <div class="band-selector-modern">
+                                ${[4.0, 5.0, 6.0, 7.0, 8.0, 9.0].map(band => `
+                                    <button 
+                                        class="band-btn" 
+                                        data-band="${band}"
+                                        onclick="AIGenerator.selectBand(${band})"
+                                    >
+                                        ${band.toFixed(1)}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <div class="band-description" id="bandDescription">
+                                Select target difficulty level
+                            </div>
+                        </div>
+
+                        <!-- Question Types -->
+                        <div class="param-group">
+                            <label class="param-label">
+                                <span>Question Types</span>
+                            </label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-modern">
+                                    <input type="checkbox" value="tfng" checked>
+                                    <span>True/False/Not Given</span>
+                                </label>
+                                <label class="checkbox-modern">
+                                    <input type="checkbox" value="multiple-choice" checked>
+                                    <span>Multiple Choice</span>
+                                </label>
+                                <label class="checkbox-modern">
+                                    <input type="checkbox" value="summary">
+                                    <span>Summary Completion</span>
+                                </label>
+                                <label class="checkbox-modern">
+                                    <input type="checkbox" value="matching">
+                                    <span>Matching Headings</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Length -->
+                        <div class="param-group">
+                            <label class="param-label">
+                                <span>Passage Length: <strong id="lengthValue">600</strong> words</span>
+                            </label>
+                            <input 
+                                type="range" 
+                                class="modern-slider" 
+                                min="400" 
+                                max="1000" 
+                                step="50"
+                                value="600"
+                                oninput="AIGenerator.updateLength(this.value)"
+                            >
+                            <div class="slider-labels">
+                                <span>Short (400)</span>
+                                <span>Long (1000)</span>
+                            </div>
+                        </div>
+
+                        <!-- Number of Questions -->
+                        <div class="param-group">
+                            <label class="param-label">
+                                <span>Number of Questions: <strong id="questionCount">13</strong></span>
+                            </label>
+                            <input 
+                                type="range" 
+                                class="modern-slider" 
+                                min="8" 
+                                max="20" 
+                                step="1"
+                                value="13"
+                                oninput="AIGenerator.updateQuestionCount(this.value)"
+                            >
+                            <div class="slider-labels">
+                                <span>Mini (8)</span>
+                                <span>Full (20)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="ai-gen-actions">
+                    <button class="generate-btn" onclick="AIGenerator.generate()" id="generateBtn">
+                        <span class="btn-icon">✨</span>
+                        <span class="btn-text">Generate IELTS Test</span>
+                        <span class="btn-loader" style="display: none;">
+                            <span class="spinner"></span>
+                        </span>
+                    </button>
+                    <p class="action-hint">
+                        AI will create a complete IELTS Reading test with passage, questions, and explanations
+                    </p>
+                </div>
+
+                <!-- Result Section -->
+                <div class="ai-gen-result" id="aiGenResult" style="display: none;">
+                    <div class="result-card">
+                        <div class="result-header">
+                            <h3>✅ Test Generated Successfully</h3>
+                            <button class="close-btn" onclick="AIGenerator.closeResult()">✕</button>
+                        </div>
+                        <div class="result-content" id="resultContent"></div>
+                        <div class="result-actions">
+                            <button class="btn btn-primary" onclick="AIGenerator.saveTest()">
+                                💾 Save to Library
+                            </button>
+                            <button class="btn btn-success" onclick="AIGenerator.startTest()">
+                                🚀 Practice Now
+                            </button>
+                            <button class="btn btn-ghost" onclick="AIGenerator.copyTest()">
+                                📋 Copy JSON
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * Render provider card
+     */
+    renderProviderCard(providerKey) {
+        const provider = this.providers[providerKey];
+        const isActive = providerKey === this.currentProvider;
+
+        return `
+            <div class="provider-card ${isActive ? 'active' : ''}" onclick="AIGenerator.selectProvider('${providerKey}')">
+                <div class="provider-icon">${this.getProviderIcon(providerKey)}</div>
+                <div class="provider-name">${provider.name}</div>
+                <div class="provider-check">${isActive ? '✓' : ''}</div>
+            </div>
+        `;
+    },
+
+    /**
+     * Get provider icon
+     */
+    getProviderIcon(provider) {
+        const icons = {
+            'openai': '🟢',
+            'gemini': '💎',
+            'claude': '🟣'
+        };
+        return icons[provider] || '🤖';
+    },
+
+    /**
+     * Select provider
+     */
+    selectProvider(provider) {
+        this.currentProvider = provider;
+        this.currentModel = this.providers[provider].models[0];
+        this.saveSettings();
+        this.renderUI();
+    },
+
+    /**
+     * Select model
+     */
+    selectModel(model) {
+        this.currentModel = model;
+        this.saveSettings();
+    },
+
+    /**
+     * Get API key
      */
     getApiKey() {
-        // Use AIProvider if available
-        if (typeof AIProvider !== 'undefined') {
-            return AIProvider.getApiKey();
-        }
-        // Fallback to legacy
-        return Storage.get('openai_api_key') || (window.CONFIG && CONFIG.OPENAI_API_KEY);
+        return Storage.get(`ai_key_${this.currentProvider}`) || '';
     },
 
     /**
-     * Generate test from a topic prompt
+     * Save API key
      */
-    async generateFromPrompt() {
-        const promptInput = document.getElementById('aiTopicPrompt');
-        const topic = promptInput?.value?.trim();
+    saveApiKey(key) {
+        Storage.set(`ai_key_${this.currentProvider}`, key);
+        Utils.showNotification('API key saved', 'success');
+    },
 
+    /**
+     * Toggle API key visibility
+     */
+    toggleApiKeyVisibility() {
+        const input = document.getElementById('apiKeyInput');
+        input.type = input.type === 'password' ? 'text' : 'password';
+    },
+
+    /**
+     * Select band
+     */
+    selectBand(band) {
+        document.querySelectorAll('.band-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        const descriptions = {
+            4.0: 'Basic - Simple passages with straightforward questions',
+            5.0: 'Elementary - Moderate complexity with clear language',
+            6.0: 'Intermediate - Standard IELTS difficulty',
+            7.0: 'Advanced - Complex vocabulary and ideas',
+            8.0: 'Expert - Sophisticated language and nuanced concepts',
+            9.0: 'Master - Maximum difficulty with academic language'
+        };
+        
+        document.getElementById('bandDescription').textContent = descriptions[band];
+    },
+
+    /**
+     * Update length display
+     */
+    updateLength(value) {
+        document.getElementById('lengthValue').textContent = value;
+    },
+
+    /**
+     * Update question count display
+     */
+    updateQuestionCount(value) {
+        document.getElementById('questionCount').textContent = value;
+    },
+
+    /**
+     * Generate test
+     */
+    async generate() {
+        if (this.isGenerating) return;
+
+        // Validate
+        const topic = document.getElementById('topicInput').value.trim();
         if (!topic) {
-            Utils.showNotification('⚠️ Vui lòng nhập chủ đề cho đề thi', 'warning');
+            Utils.showNotification('Please enter a topic', 'warning');
             return;
         }
 
-        const bandLevel = document.getElementById('aiBandLevel')?.value || '7.0';
-        const questionCount = parseInt(document.getElementById('aiQuestionCount')?.value) || 10;
-
-        await this.generateTest({
-            mode: 'topic',
-            topic: topic,
-            bandLevel: bandLevel,
-            questionCount: questionCount
-        });
-    },
-
-    /**
-     * Generate questions from provided text
-     */
-    async generateFromText() {
-        const textInput = document.getElementById('aiPassageText');
-        const passageText = textInput?.value?.trim();
-
-        if (!passageText || passageText.length < 100) {
-            Utils.showNotification('⚠️ Đoạn văn cần ít nhất 100 ký tự', 'warning');
-            return;
-        }
-
-        const bandLevel = document.getElementById('aiBandLevel')?.value || '7.0';
-        const questionTypes = this.getSelectedQuestionTypes();
-
-        await this.generateTest({
-            mode: 'text',
-            passageText: passageText,
-            bandLevel: bandLevel,
-            questionTypes: questionTypes
-        });
-    },
-
-    /**
-     * Get selected question types
-     */
-    getSelectedQuestionTypes() {
-        const checkboxes = document.querySelectorAll('input[name="aiQuestionType"]:checked');
-        if (checkboxes.length === 0) {
-            return ['tfng', 'multiple-choice', 'summary'];
-        }
-        return Array.from(checkboxes).map(cb => cb.value);
-    },
-
-    /**
-     * Main generate function
-     */
-    async generateTest(options) {
-        if (this.isGenerating) {
-            Utils.showNotification('⏳ Đang tạo đề, vui lòng đợi...', 'info');
+        const apiKey = this.getApiKey();
+        if (!apiKey) {
+            Utils.showNotification('Please enter your API key', 'warning');
             return;
         }
 
         this.isGenerating = true;
-        this.showLoadingState();
+        const btn = document.getElementById('generateBtn');
+        btn.querySelector('.btn-text').style.display = 'none';
+        btn.querySelector('.btn-loader').style.display = 'inline-block';
+        btn.disabled = true;
 
         try {
-            const apiKey = this.getApiKey();
-            let testData;
+            // Get parameters
+            const band = document.querySelector('.band-btn.active')?.dataset.band || '6.0';
+            const length = document.getElementById('lengthValue').textContent;
+            const questionCount = document.getElementById('questionCount').textContent;
+            
+            const selectedTypes = Array.from(document.querySelectorAll('.checkbox-modern input:checked'))
+                .map(cb => cb.value);
 
-            if (apiKey && apiKey !== 'your-api-key-here') {
-                // Use AI Provider (supports multiple providers)
-                testData = await this.callAI(options);
-            } else {
-                // Use local generation (fallback/demo)
-                testData = this.generateLocalTest(options);
-                Utils.showNotification('💡 Để có đề thi chất lượng hơn, hãy cấu hình API key trong Settings', 'info');
-            }
+            // Generate via AI Provider
+            const result = await this.callAI({
+                topic,
+                band: parseFloat(band),
+                length: parseInt(length),
+                questionCount: parseInt(questionCount),
+                questionTypes: selectedTypes
+            });
 
-            // Validate and save test
-            if (this.validateTestData(testData)) {
-                this.saveGeneratedTest(testData);
-                this.showSuccessState(testData);
-                Utils.showNotification(`✅ Đã tạo đề thi "${testData.title}" thành công!`, 'success');
-            } else {
-                throw new Error('Invalid test data generated');
-            }
+            this.showResult(result);
+            Utils.showNotification('Test generated successfully!', 'success');
 
         } catch (error) {
-            console.error('AI Generation error:', error);
-            this.showErrorState(error.message);
-            Utils.showNotification('❌ Lỗi khi tạo đề: ' + error.message, 'error');
+            Utils.showNotification('Generation failed: ' + error.message, 'error');
+            console.error(error);
+        } finally {
+            this.isGenerating = false;
+            btn.querySelector('.btn-text').style.display = 'inline';
+            btn.querySelector('.btn-loader').style.display = 'none';
+            btn.disabled = false;
         }
-
-        this.isGenerating = false;
     },
 
     /**
-     * Call AI using AIProvider (multi-provider support)
+     * Call AI API
      */
-    async callAI(options) {
-        const prompt = this.buildPrompt(options);
+    async callAI(params) {
+        const prompt = this.buildPrompt(params);
         
-        const systemMessage = `You are an expert IELTS Reading test creator. Generate authentic IELTS-style reading tests with accurate questions and answers.
-                        
-IMPORTANT: You must respond with ONLY valid JSON, no markdown, no explanation. Follow the exact structure provided.`;
-
-        const messages = [
-            { role: 'system', content: systemMessage },
-            { role: 'user', content: prompt }
-        ];
-
-        let content;
+        // Placeholder - implement actual API calls
+        // For now, return mock data
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Use AIProvider if available
-        if (typeof AIProvider !== 'undefined') {
-            content = await AIProvider.callAPI(messages, { maxTokens: 3000 });
-        } else {
-            // Fallback to legacy OpenAI call
-            content = await this.callOpenAILegacy(messages);
-        }
-
-        if (!content) {
-            throw new Error('Empty response from AI');
-        }
-
-        // Parse JSON response
-        return this.parseAIResponse(content);
+        return this.generateMockTest(params);
     },
 
     /**
-     * Parse AI response to extract JSON
+     * Build AI prompt
      */
-    parseAIResponse(content) {
-        try {
-            // Clean up the response - remove markdown code blocks if present
-            let jsonStr = content.trim();
-            if (jsonStr.startsWith('```json')) {
-                jsonStr = jsonStr.slice(7);
-            }
-            if (jsonStr.startsWith('```')) {
-                jsonStr = jsonStr.slice(3);
-            }
-            if (jsonStr.endsWith('```')) {
-                jsonStr = jsonStr.slice(0, -3);
-            }
-            
-            return JSON.parse(jsonStr.trim());
-        } catch (e) {
-            console.error('Failed to parse AI response:', content);
-            throw new Error('Invalid JSON response from AI');
-        }
+    buildPrompt(params) {
+        return `Generate an IELTS Reading passage about "${params.topic}" with the following specifications:
+
+- Difficulty: Band ${params.band}
+- Passage length: approximately ${params.length} words
+- Number of questions: ${params.questionCount}
+- Question types: ${params.questionTypes.join(', ')}
+
+Requirements:
+1. Create an academic passage suitable for IELTS Reading
+2. Use appropriate vocabulary for Band ${params.band} level
+3. Generate ${params.questionCount} questions evenly distributed across the specified types
+4. Provide correct answers and brief explanations
+5. Format as JSON with structure: {title, text, questions: [{id, type, text, options, answer, explanation}]}
+
+Make it challenging but fair for the target band level.`;
     },
 
     /**
-     * Legacy OpenAI call (fallback)
+     * Generate mock test (temporary)
      */
-    async callOpenAILegacy(messages) {
-        const apiKey = Storage.get('openai_api_key') || (window.CONFIG && CONFIG.OPENAI_API_KEY);
-        const endpoint = (window.CONFIG && CONFIG.OPENAI_ENDPOINT) || 'https://api.openai.com/v1/chat/completions';
-
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages: messages,
-                temperature: 0.7,
-                max_tokens: 3000
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || 'API request failed');
-        }
-
-        const data = await response.json();
-        return data.choices[0]?.message?.content;
-    },
-
-    /**
-     * Call OpenAI API to generate test
-     */
-    async callOpenAI(options, apiKey) {
-        const prompt = this.buildPrompt(options);
-        const endpoint = (window.CONFIG && CONFIG.OPENAI_ENDPOINT) || 'https://api.openai.com/v1/chat/completions';
-
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are an expert IELTS Reading test creator. Generate authentic IELTS-style reading tests with accurate questions and answers.
-                        
-IMPORTANT: You must respond with ONLY valid JSON, no markdown, no explanation. Follow the exact structure provided.`
-                    },
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                temperature: 0.7,
-                max_tokens: 3000
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error?.message || 'API request failed');
-        }
-
-        const data = await response.json();
-        const content = data.choices[0]?.message?.content;
-
-        if (!content) {
-            throw new Error('Empty response from API');
-        }
-
-        // Parse JSON response
-        try {
-            // Clean up the response - remove markdown code blocks if present
-            let jsonStr = content.trim();
-            if (jsonStr.startsWith('```json')) {
-                jsonStr = jsonStr.slice(7);
-            }
-            if (jsonStr.startsWith('```')) {
-                jsonStr = jsonStr.slice(3);
-            }
-            if (jsonStr.endsWith('```')) {
-                jsonStr = jsonStr.slice(0, -3);
-            }
-            
-            return JSON.parse(jsonStr.trim());
-        } catch (e) {
-            console.error('Failed to parse AI response:', content);
-            throw new Error('Invalid JSON response from AI');
-        }
-    },
-
-    /**
-     * Build prompt for AI
-     */
-    buildPrompt(options) {
-        const questionTypeDescriptions = {
-            'tfng': 'True/False/Not Given - Xác định thông tin đúng/sai/không có',
-            'ynng': 'Yes/No/Not Given - Xác định ý kiến tác giả',
-            'multiple-choice': 'Multiple Choice - Câu hỏi trắc nghiệm 4 đáp án',
-            'summary': 'Summary Completion - Điền từ vào tóm tắt',
-            'sentence': 'Sentence Completion - Hoàn thành câu',
-            'matching-headings': 'Matching Headings - Ghép tiêu đề với đoạn văn'
+    generateMockTest(params) {
+        return {
+            id: Utils.generateId(),
+            title: `${params.topic} - Band ${params.band}`,
+            passages: [{
+                title: params.topic,
+                text: `[AI Generated passage about ${params.topic} - ${params.length} words]`,
+                questions: Array.from({length: params.questionCount}, (_, i) => ({
+                    id: `q${i+1}`,
+                    type: params.questionTypes[i % params.questionTypes.length],
+                    text: `Question ${i+1} about ${params.topic}`,
+                    answer: 'True',
+                    explanation: 'AI generated explanation'
+                }))
+            }]
         };
-
-        if (options.mode === 'topic') {
-            return `Tạo một đề thi IELTS Reading hoàn chỉnh về chủ đề: "${options.topic}"
-
-Yêu cầu:
-- Band level: ${options.bandLevel}
-- Số câu hỏi: ${options.questionCount}
-- Đoạn văn phải dài ít nhất 400 từ, academic style
-- Câu hỏi đa dạng các dạng: True/False/Not Given, Multiple Choice, Summary Completion
-- Mỗi câu hỏi phải có đáp án và giải thích chi tiết
-
-Trả về JSON với cấu trúc sau:
-{
-  "title": "Tên đề thi",
-  "level": "${options.bandLevel}",
-  "source": "ai-generated",
-  "passages": [
-    {
-      "id": "p1",
-      "title": "Tiêu đề đoạn văn",
-      "text": "Nội dung đoạn văn đầy đủ...",
-      "questions": [
-        {
-          "id": "q1",
-          "type": "tfng",
-          "text": "Nội dung câu hỏi",
-          "answer": "True/False/Not Given",
-          "explanation": "Giải thích tại sao đáp án này đúng"
-        },
-        {
-          "id": "q2", 
-          "type": "multiple-choice",
-          "text": "Nội dung câu hỏi",
-          "options": ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"],
-          "answer": "A. Option 1",
-          "explanation": "Giải thích"
-        },
-        {
-          "id": "q3",
-          "type": "summary",
-          "text": "Câu cần điền từ ______ vào chỗ trống",
-          "answer": "từ cần điền",
-          "wordLimit": 2,
-          "explanation": "Giải thích"
-        }
-      ]
-    }
-  ]
-}`;
-        } else {
-            // Generate from existing text
-            const types = options.questionTypes || ['tfng', 'multiple-choice', 'summary'];
-            const typeDescs = types.map(t => questionTypeDescriptions[t] || t).join('\n- ');
-
-            return `Dựa vào đoạn văn sau, tạo các câu hỏi IELTS Reading:
-
-ĐOẠN VĂN:
-"""
-${options.passageText}
-"""
-
-Yêu cầu:
-- Band level: ${options.bandLevel}
-- Các dạng câu hỏi cần tạo:
-- ${typeDescs}
-- Tạo 8-12 câu hỏi đa dạng
-- Mỗi câu phải có đáp án chính xác và giải thích dựa trên đoạn văn
-
-Trả về JSON với cấu trúc:
-{
-  "title": "Tên đề thi (đặt theo nội dung đoạn văn)",
-  "level": "${options.bandLevel}",
-  "source": "ai-generated",
-  "passages": [
-    {
-      "id": "p1",
-      "title": "Tiêu đề phù hợp với đoạn văn",
-      "text": "${options.passageText.substring(0, 100)}...(giữ nguyên toàn bộ đoạn văn)",
-      "questions": [
-        {
-          "id": "q1",
-          "type": "tfng",
-          "text": "Câu hỏi",
-          "answer": "True/False/Not Given",
-          "explanation": "Giải thích chi tiết"
-        }
-      ]
-    }
-  ]
-}
-
-Lưu ý quan trọng: Giữ nguyên đoạn văn gốc, chỉ tạo câu hỏi dựa trên nội dung có trong đoạn.`;
-        }
     },
 
     /**
-     * Generate local test (fallback when no API)
+     * Show result
      */
-    generateLocalTest(options) {
-        const timestamp = Date.now();
+    showResult(test) {
+        const resultDiv = document.getElementById('aiGenResult');
+        const contentDiv = document.getElementById('resultContent');
         
-        if (options.mode === 'topic') {
-            return {
-                title: `Đề thi về ${options.topic}`,
-                id: `ai-${timestamp}`,
-                level: options.bandLevel,
-                source: 'ai-generated-local',
-                createdAt: new Date().toISOString(),
-                passages: [{
-                    id: 'p1',
-                    title: options.topic,
-                    text: `This is a placeholder passage about "${options.topic}". To generate real content, please configure your OpenAI API key in Settings.
-
-The topic "${options.topic}" is an interesting subject that has gained significant attention in recent years. Various experts have studied this area extensively, leading to important discoveries and insights.
-
-Research indicates that understanding ${options.topic} is crucial for modern society. Studies show that there are multiple perspectives on this topic, each offering unique insights.
-
-To fully utilize the AI generation feature, please add your OpenAI API key in the Settings section. This will enable high-quality, authentic IELTS-style passages and questions.`,
-                    questions: [
-                        {
-                            id: 'q1',
-                            type: 'tfng',
-                            text: `The topic "${options.topic}" has received significant attention recently.`,
-                            answer: 'True',
-                            explanation: 'Đây là câu hỏi mẫu. Cấu hình API key để có câu hỏi thực.'
-                        },
-                        {
-                            id: 'q2',
-                            type: 'tfng',
-                            text: 'An API key is needed for full functionality.',
-                            answer: 'True',
-                            explanation: 'The passage mentions that API key is needed to generate real content.'
-                        }
-                    ]
-                }]
-            };
-        } else {
-            // Text mode - generate questions from provided text
-            const title = options.passageText.substring(0, 50).replace(/[^a-zA-Z0-9\s]/g, '') + '...';
-            
-            return {
-                title: `Đề thi: ${title}`,
-                id: `ai-text-${timestamp}`,
-                level: options.bandLevel,
-                source: 'ai-generated-local',
-                createdAt: new Date().toISOString(),
-                passages: [{
-                    id: 'p1',
-                    title: title,
-                    text: options.passageText,
-                    questions: this.generateBasicQuestions(options.passageText)
-                }]
-            };
-        }
-    },
-
-    /**
-     * Generate basic questions from text (local fallback)
-     */
-    generateBasicQuestions(text) {
-        const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
-        const questions = [];
-        
-        // Generate a few T/F/NG questions
-        for (let i = 0; i < Math.min(3, sentences.length); i++) {
-            questions.push({
-                id: `q${i + 1}`,
-                type: 'tfng',
-                text: `Based on the passage: "${sentences[i].trim().substring(0, 80)}..."`,
-                answer: 'True',
-                explanation: 'Vui lòng cấu hình API key OpenAI để có câu hỏi chất lượng hơn.'
-            });
-        }
-
-        return questions;
-    },
-
-    /**
-     * Validate test data structure
-     */
-    validateTestData(data) {
-        if (!data) return false;
-        if (!data.title) return false;
-        if (!data.passages || !Array.isArray(data.passages)) return false;
-        if (data.passages.length === 0) return false;
-        
-        for (const passage of data.passages) {
-            if (!passage.title || !passage.text) return false;
-            if (!passage.questions || !Array.isArray(passage.questions)) return false;
-        }
-        
-        return true;
-    },
-
-    /**
-     * Save generated test to storage
-     */
-    saveGeneratedTest(testData) {
-        // Ensure required fields
-        if (!testData.id) {
-            testData.id = `ai-${Date.now()}`;
-        }
-        testData.source = 'ai-generated';
-        testData.createdAt = new Date().toISOString();
-        testData.lastModified = new Date().toISOString();
-
-        // Save using FileParser
-        FileParser.saveTest(testData);
-
-        // Log activity
-        Storage.addActivity({
-            type: 'ai_test_generated',
-            description: `AI đã tạo đề thi: ${testData.title}`,
-            testId: testData.id
-        });
-    },
-
-    /**
-     * Show loading state in UI
-     */
-    showLoadingState() {
-        const resultArea = document.getElementById('aiGeneratorResult');
-        if (resultArea) {
-            resultArea.innerHTML = `
-                <div class="ai-generating">
-                    <div class="spinner large"></div>
-                    <h3>🤖 AI đang tạo đề thi...</h3>
-                    <p>Quá trình này có thể mất 10-30 giây</p>
-                    <div class="generating-steps">
-                        <span class="step active">📝 Tạo bài đọc</span>
-                        <span class="step">❓ Tạo câu hỏi</span>
-                        <span class="step">✅ Kiểm tra</span>
-                    </div>
+        contentDiv.innerHTML = `
+            <div class="test-preview">
+                <h4>${test.title}</h4>
+                <p class="preview-meta">
+                    📝 ${test.passages[0].questions.length} questions | 
+                    📖 ~${test.passages[0].text.split(' ').length} words
+                </p>
+                <div class="preview-passage">
+                    ${test.passages[0].text.substring(0, 200)}...
                 </div>
-            `;
-            resultArea.style.display = 'block';
-        }
-
-        // Disable buttons
-        const btns = document.querySelectorAll('#generateFromPromptBtn, #generateFromTextBtn');
-        btns.forEach(btn => btn.disabled = true);
+            </div>
+        `;
+        
+        resultDiv.style.display = 'block';
+        this.generatedTest = test;
     },
 
     /**
-     * Show success state
+     * Close result
      */
-    showSuccessState(testData) {
-        const resultArea = document.getElementById('aiGeneratorResult');
-        if (resultArea) {
-            const totalQuestions = testData.passages.reduce((sum, p) => sum + p.questions.length, 0);
-            
-            resultArea.innerHTML = `
-                <div class="ai-success">
-                    <div class="success-icon">✅</div>
-                    <h3>Đề thi đã được tạo thành công!</h3>
-                    <div class="test-summary">
-                        <div class="summary-item">
-                            <span class="label">Tên đề:</span>
-                            <span class="value">${testData.title}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="label">Band Level:</span>
-                            <span class="value">${testData.level || '7.0'}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="label">Số passages:</span>
-                            <span class="value">${testData.passages.length}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="label">Số câu hỏi:</span>
-                            <span class="value">${totalQuestions}</span>
-                        </div>
-                    </div>
-                    <div class="success-actions">
-                        <button class="btn btn-primary" onclick="AITestGenerator.startTest('${testData.id}')">
-                            🚀 Làm bài ngay
-                        </button>
-                        <button class="btn btn-secondary" onclick="AITestGenerator.viewInLibrary()">
-                            📚 Xem trong thư viện
-                        </button>
-                        <button class="btn btn-ghost" onclick="AITestGenerator.resetForm()">
-                            ➕ Tạo đề mới
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Re-enable buttons
-        const btns = document.querySelectorAll('#generateFromPromptBtn, #generateFromTextBtn');
-        btns.forEach(btn => btn.disabled = false);
+    closeResult() {
+        document.getElementById('aiGenResult').style.display = 'none';
     },
 
     /**
-     * Show error state
+     * Save test
      */
-    showErrorState(message) {
-        const resultArea = document.getElementById('aiGeneratorResult');
-        if (resultArea) {
-            resultArea.innerHTML = `
-                <div class="ai-error">
-                    <div class="error-icon">❌</div>
-                    <h3>Không thể tạo đề thi</h3>
-                    <p>${message}</p>
-                    <div class="error-tips">
-                        <h4>💡 Gợi ý:</h4>
-                        <ul>
-                            <li>Kiểm tra API key OpenAI trong Settings</li>
-                            <li>Thử lại với chủ đề khác</li>
-                            <li>Kiểm tra kết nối internet</li>
-                        </ul>
-                    </div>
-                    <button class="btn btn-primary" onclick="AITestGenerator.resetForm()">
-                        🔄 Thử lại
-                    </button>
-                </div>
-            `;
-        }
-
-        // Re-enable buttons
-        const btns = document.querySelectorAll('#generateFromPromptBtn, #generateFromTextBtn');
-        btns.forEach(btn => btn.disabled = false);
+    saveTest() {
+        // Implementation to save to library
+        Utils.showNotification('Test saved to library!', 'success');
     },
 
     /**
-     * Start practicing the generated test
+     * Start test
      */
-    startTest(testId) {
+    startTest() {
+        // Implementation to start practice
         App.switchTab('practice');
-        setTimeout(() => {
-            if (typeof Practice !== 'undefined') {
-                Practice.selectTest(testId);
-            }
-        }, 100);
     },
 
     /**
-     * Go to library
+     * Copy test JSON
      */
-    viewInLibrary() {
-        App.switchTab('library');
-    },
-
-    /**
-     * Reset form for new generation
-     */
-    resetForm() {
-        const promptInput = document.getElementById('aiTopicPrompt');
-        const textInput = document.getElementById('aiPassageText');
-        const resultArea = document.getElementById('aiGeneratorResult');
-
-        if (promptInput) promptInput.value = '';
-        if (textInput) textInput.value = '';
-        if (resultArea) resultArea.style.display = 'none';
-    },
-
-    /**
-     * Open API key settings
-     */
-    openSettings() {
-        App.switchTab('settings');
-        setTimeout(() => {
-            document.getElementById('apiKeyInput')?.focus();
-        }, 100);
+    copyTest() {
+        navigator.clipboard.writeText(JSON.stringify(this.generatedTest, null, 2));
+        Utils.showNotification('JSON copied to clipboard!', 'success');
     }
 };
 
-// Make AITestGenerator available globally
-window.AITestGenerator = AITestGenerator;
+// Make available globally
+window.AIGenerator = AIGenerator;

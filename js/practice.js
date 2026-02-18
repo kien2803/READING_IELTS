@@ -595,7 +595,7 @@ These coffee houses quickly became centers of social activity and communication 
     },
 
     /**
-     * Render questions - improved UI
+     * Render questions - supports mixed question types
      */
     renderQuestions() {
         const questionsContent = document.getElementById('questionsContent');
@@ -609,20 +609,68 @@ These coffee houses quickly became centers of social activity and communication 
             questionCount.textContent = `${answered}/${this.currentQuestions.length}`;
         }
 
-        // Render based on question type
-        const firstType = this.currentQuestions[0]?.type;
+        // Render each question individually based on its own type
+        const questionsHTML = this.currentQuestions.map((q, index) => {
+            return this.renderSingleQuestion(q, index);
+        }).join('');
         
-        if (firstType === 'multiple-choice') {
-            questionsContent.innerHTML = this.renderMultipleChoice();
-        } else if (firstType === 'tfng' || firstType === 'ynng') {
-            questionsContent.innerHTML = this.renderTFNG();
-        } else {
-            questionsContent.innerHTML = this.renderTextInput();
-        }
+        questionsContent.innerHTML = questionsHTML;
 
         // Bind answer events
         this.bindAnswerEvents();
     },
+
+    /**
+     * Render a single question based on its type
+     */
+    renderSingleQuestion(q, index) {
+        // Multiple Choice
+        if (q.type === 'multiple-choice') {
+            return `
+                <div class="question-item" data-id="${q.id}">
+                    <p class="question-text"><strong>Question ${index + 1}:</strong> ${q.text}</p>
+                    <div class="options-list">
+                        ${(q.options || []).map((option, i) => `
+                            <label class="option-item">
+                                <input type="radio" name="${q.id}" value="${option}" class="option-radio">
+                                <span class="option-label">${String.fromCharCode(65 + i)}. ${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } 
+        // True/False/Not Given or Yes/No/Not Given
+        else if (q.type === 'tfng' || q.type === 'ynng') {
+            const options = q.type === 'ynng' 
+                ? ['Yes', 'No', 'Not Given']
+                : ['True', 'False', 'Not Given'];
+            return `
+                <div class="question-item" data-id="${q.id}">
+                    <p class="question-text"><strong>Question ${index + 1}:</strong> ${q.text}</p>
+                    <div class="options-list">
+                        ${options.map(option => `
+                            <label class="option-item">
+                                <input type="radio" name="${q.id}" value="${option}" class="option-radio">
+                                <span class="option-label">${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } 
+        // Text Input (summary, sentence completion, etc.)
+        else {
+            return `
+                <div class="question-item" data-id="${q.id}">
+                    <p class="question-text"><strong>Question ${index + 1}:</strong> ${q.text}</p>
+                    ${q.wordLimit ? `<p class="word-limit-hint">Write NO MORE THAN ${q.wordLimit} word(s)</p>` : ''}
+                    <input type="text" class="question-input" data-id="${q.id}" placeholder="Type your answer here...">
+                </div>
+            `;
+        }
+    },
+
 
     /**
      * Render multiple choice questions
