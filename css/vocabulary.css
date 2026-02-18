@@ -241,7 +241,7 @@
 }
 
 .method-tab.active {
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     border-color: transparent;
     color: #fff;
 }
@@ -528,7 +528,7 @@
     display: flex;
     gap: var(--spacing-lg);
     padding: var(--spacing-md) var(--spacing-lg);
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    background: rgba(59, 130, 246, 0.05);
     border-radius: var(--radius-md);
     margin-bottom: var(--spacing-lg);
     flex-wrap: wrap;
@@ -691,14 +691,14 @@
     justify-content: center;
     gap: var(--spacing-lg);
     padding: var(--spacing-2xl);
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     border-radius: var(--radius-xl);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-xl);
 }
 
 .flashcard-back {
     transform: rotateY(180deg);
-    background: var(--gradient-success);
+    background: var(--success-color);
 }
 
 .card-hint {

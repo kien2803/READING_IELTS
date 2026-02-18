@@ -1,1332 +1,1821 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="IELTS Reading Practice - Road to 9.0 | Luyện thi IELTS Reading">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="IELTS Reading Practice - Road to 9.0 | Luyện thi IELTS Reading"
+    />
     <title>IELTS Reading - Road to 9.0</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <!-- CSS Files -->
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/sidebar.css">
-    <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="css/practice.css">
-    <link rel="stylesheet" href="css/vocabulary.css">
-    <link rel="stylesheet" href="css/fullscreen.css">
-    <link rel="stylesheet" href="css/ai-generator.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/dashboard-charts.css" />
+    <link rel="stylesheet" href="css/practice.css" />
+    <link rel="stylesheet" href="css/vocabulary.css" />
+    <link rel="stylesheet" href="css/fullscreen.css" />
+    <link rel="stylesheet" href="css/ai-generator.css" />
+  </head>
+  <body>
     <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-container">
-                    <div class="logo-icon">🎯</div>
-                    <div class="logo-text">
-                        <h1>IELTS Reading</h1>
-                        <span class="logo-subtitle">Road to 9.0</span>
-                    </div>
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-container">
+            <div class="logo-icon"><i class="ph-fill ph-read-cv-logo"></i></div>
+            <div class="logo-text">
+              <h1>IELTS Reading</h1>
+              <span class="logo-subtitle">Road to 9.0</span>
+            </div>
+          </div>
+          <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            title="Toggle Sidebar"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <span class="nav-section-title">Main</span>
+            <button class="nav-item active" data-tab="dashboard">
+              <span class="nav-icon"><i class="ph ph-squares-four"></i></span>
+              <span class="nav-label">Dashboard</span>
+            </button>
+            <button class="nav-item" data-tab="practice">
+              <span class="nav-icon"><i class="ph ph-pencil-circle"></i></span>
+              <span class="nav-label">Luyện tập</span>
+            </button>
+            <button class="nav-item" data-tab="library">
+              <span class="nav-icon"><i class="ph ph-books"></i></span>
+              <span class="nav-label">Thư viện đề</span>
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <span class="nav-section-title">Practice Modes</span>
+            <button class="nav-item" data-tab="minitest">
+              <span class="nav-icon"><i class="ph ph-timer"></i></span>
+              <span class="nav-label">Mini-Test</span>
+              <span class="nav-badge">New</span>
+            </button>
+            <button class="nav-item" data-tab="drill">
+              <span class="nav-icon"><i class="ph ph-lightning"></i></span>
+              <span class="nav-label">Drill Mode</span>
+              <span class="nav-badge">New</span>
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <span class="nav-section-title">Learning</span>
+            <button class="nav-item" data-tab="vocabulary">
+              <span class="nav-icon"><i class="ph ph-book-bookmark"></i></span>
+              <span class="nav-label">Từ vựng</span>
+            </button>
+            <button class="nav-item" data-tab="errors">
+              <span class="nav-icon"><i class="ph ph-warning-circle"></i></span>
+              <span class="nav-label">Lỗi sai</span>
+            </button>
+            <button class="nav-item" data-tab="aianalysis">
+              <span class="nav-icon"><i class="ph ph-robot"></i></span>
+              <span class="nav-label">AI Phân tích</span>
+              <span class="nav-badge hot">Hot</span>
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <span class="nav-section-title">Settings</span>
+            <button class="nav-item" data-tab="upload">
+              <span class="nav-icon"><i class="ph ph-upload-simple"></i></span>
+              <span class="nav-label">Upload/Tạo đề</span>
+            </button>
+            <button class="nav-item" data-tab="settings">
+              <span class="nav-icon"><i class="ph ph-gear"></i></span>
+              <span class="nav-label">Cài đặt</span>
+            </button>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-progress">
+            <div class="progress-circle" id="sidebarProgress">
+              <svg viewBox="0 0 36 36">
+                <path
+                  class="circle-bg"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  class="circle-progress"
+                  stroke-dasharray="45, 100"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+              </svg>
+              <span class="progress-text">45%</span>
+            </div>
+            <div class="user-info">
+              <span class="user-level">Band hiện tại</span>
+              <span class="user-band" id="currentBandSidebar">6.5</span>
+            </div>
+          </div>
+          <div class="streak-info">
+            <span class="streak-icon"><i class="ph-fill ph-fire"></i></span>
+            <span class="streak-count" id="streakCount">0</span>
+            <span class="streak-label">ngày liên tục</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+              <span></span><span></span><span></span>
+            </button>
+            <div class="breadcrumb">
+              <span id="currentSection">Dashboard</span>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <div class="quick-stats">
+              <div class="quick-stat">
+                <span class="stat-icon"><i class="ph ph-file-text"></i></span>
+                <span class="stat-value" id="topbarTests">0</span>
+              </div>
+              <div class="quick-stat">
+                <span class="stat-icon"><i class="ph ph-clock"></i></span>
+                <span class="stat-value" id="topbarTime">0h</span>
+              </div>
+            </div>
+            <button
+              class="btn btn-primary btn-quick-practice"
+              onclick="App.startQuickPractice()"
+            >
+            <button
+              class="btn btn-primary btn-quick-practice"
+              onclick="App.startQuickPractice()"
+            >
+              <i class="ph ph-lightning"></i> Luyện tập nhanh
+            </button>
+          </div>
+        </header>
+
+        <!-- Content Container -->
+        <div class="content-wrapper">
+          <!-- Dashboard Tab -->
+          <section id="dashboard" class="tab-content active">
+            <div class="section-header">
+              <h2><i class="ph ph-chart-bar"></i> Tổng quan tiến độ</h2>
+              <p class="section-subtitle">
+                Theo dõi hành trình chinh phục IELTS Reading của bạn
+              </p>
+            </div>
+
+            <div class="dashboard-grid">
+              <!-- Main Stats Cards -->
+              <div class="stats-row">
+                <div class="stat-card gradient-primary">
+                  <div class="stat-card-icon"><i class="ph ph-clipboard-text"></i></div>
+                  <div class="stat-card-content">
+                    <span class="stat-card-value" id="completedTests">0</span>
+                    <span class="stat-card-label">Bài đã hoàn thành</span>
+                  </div>
                 </div>
-                <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <div class="stat-card gradient-success">
+                  <div class="stat-card-icon"><i class="ph ph-target"></i></div>
+                  <div class="stat-card-content">
+                    <span class="stat-card-value" id="averageScore">0.0</span>
+                    <span class="stat-card-label">Band trung bình</span>
+                  </div>
+                </div>
+                <div class="stat-card gradient-info">
+                  <div class="stat-card-icon"><i class="ph ph-clock"></i></div>
+                  <div class="stat-card-content">
+                    <span class="stat-card-value" id="totalTime">0h</span>
+                    <span class="stat-card-label">Thời gian luyện</span>
+                  </div>
+                </div>
+                <div class="stat-card gradient-warning">
+                  <div class="stat-card-icon"><i class="ph ph-book-bookmark"></i></div>
+                  <div class="stat-card-content">
+                    <span class="stat-card-value" id="vocabCount">0</span>
+                    <span class="stat-card-label">Từ vựng đã học</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Progress Section -->
+              <div class="card-row">
+                <div class="card full-width">
+                  <div class="card-header">
+                    <h3><i class="ph ph-trend-up"></i> Tiến độ học tập</h3>
+                    <span class="target-badge"
+                      >Target: Band
+                      <strong id="targetBandDisplay">8.0</strong></span
+                    >
+                  </div>
+                  <div class="progress-section">
+                    <div class="progress-bar large">
+                      <div
+                        class="progress-fill"
+                        id="overallProgress"
+                        style="width: 45%"
+                      >
+                        <span>45%</span>
+                      </div>
+                    </div>
+                    <div class="progress-milestones">
+                      <span class="milestone" style="left: 25%">Band 6</span>
+                      <span class="milestone" style="left: 50%">Band 7</span>
+                      <span class="milestone" style="left: 75%">Band 8</span>
+                      <span class="milestone" style="left: 100%">Band 9</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Two Column Layout -->
+              <div class="card-row two-col">
+                <!-- Weakness Analysis -->
+                <div class="card">
+                  <div class="card-header">
+                    <h3><i class="ph ph-warning-octagon"></i> Dạng bài cần cải thiện</h3>
+                    <button
+                      class="btn btn-sm btn-ghost"
+                      onclick="Dashboard.refreshWeaknesses()"
+                    >
+                      <i class="ph ph-arrow-clockwise"></i>
+                    </button>
+                  </div>
+                  <div class="weakness-list" id="weaknessList">
+                    <p class="empty-state">
+                      Hoàn thành thêm bài test để phân tích
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                  <div class="card-header">
+                    <h3><i class="ph ph-calendar"></i> Hoạt động gần đây</h3>
+                  </div>
+                  <div class="activity-list" id="recentActivity">
+                    <p class="empty-state">Chưa có hoạt động nào</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Charts Section -->
+              <div class="charts-section">
+                  <div class="section-header">
+                  <div class="section-header">
+                      <h2><i class="ph ph-chart-pie-slice"></i> Biểu đồ phân tích</h2>
+                      <button class="btn btn-sm btn-ghost" onclick="DashboardCharts.refresh()"><i class="ph ph-arrow-clockwise"></i> Làm mới</button>
+                  </div>
+                  
+                  <div class="charts-grid">
+                      <!-- Line Chart - Progress Over Time -->
+                      <div class="chart-container">
+                      <div class="chart-container">
+                          <h3><i class="ph ph-trend-up"></i> Tiến độ theo thời gian</h3>
+                          <canvas id="lineChart"></canvas>
+                      </div>
+
+                      <!-- Radar Chart - Skills Analysis -->
+                      <div class="chart-container">
+                      <div class="chart-container">
+                          <h3><i class="ph ph-target"></i> Phân tích kỹ năng</h3>
+                          <canvas id="radarChart"></canvas>
+                      </div>
+                  </div>
+
+                  <div class="charts-grid">
+                      <!-- Bar Chart - Band Distribution -->
+                      <div class="chart-container">
+                      <div class="chart-container">
+                          <h3><i class="ph ph-chart-bar"></i> Phân bố Band Score</h3>
+                          <canvas id="barChart"></canvas>
+                      </div>
+
+                      <!-- Pie Chart - Question Type Accuracy -->
+                      <div class="chart-container">
+                      <div class="chart-container">
+                          <h3><i class="ph ph-check-circle"></i> Độ chính xác theo dạng câu hỏi</h3>
+                          <canvas id="pieChart"></canvas>
+                      </div>
+                  </div>
+
+                  <!-- Performance Table -->
+                  <!-- Performance Table -->
+                  <div class="chart-container full-width">
+                      <h3><i class="ph ph-table"></i> Kết quả gần đây</h3>
+                      <div id="tableChart">
+                          <p class="empty-state">Chưa có dữ liệu</p>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Quick Actions -->
+              <div class="card-row">
+                <div class="card full-width">
+                  <div class="card-header">
+                    <h3>🚀 Bắt đầu học ngay</h3>
+                  </div>
+                  <div class="quick-actions-grid">
+                    <button
+                      class="quick-action-card"
+                      onclick="App.switchTab('practice')"
+                    >
+                      <span class="action-icon"><i class="ph ph-pencil-circle"></i></span>
+                      <span class="action-title">Full Test</span>
+                      <span class="action-desc">Luyện đề hoàn chỉnh</span>
+                    </button>
+                    <button
+                      class="quick-action-card"
+                      onclick="App.switchTab('minitest')"
+                    >
+                      <span class="action-icon"><i class="ph ph-timer"></i></span>
+                      <span class="action-title">Mini-Test</span>
+                      <span class="action-desc">13 câu / 15 phút</span>
+                    </button>
+                    <button
+                      class="quick-action-card"
+                      onclick="App.switchTab('drill')"
+                    >
+                      <span class="action-icon"><i class="ph ph-lightning"></i></span>
+                      <span class="action-title">Drill</span>
+                      <span class="action-desc">Luyện dạng bài yếu</span>
+                    </button>
+                    <button
+                      class="quick-action-card"
+                      onclick="App.switchTab('aianalysis')"
+                    >
+                      <span class="action-icon"><i class="ph ph-robot"></i></span>
+                      <span class="action-title">AI Analysis</span>
+                      <span class="action-desc">Phân tích điểm yếu</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Practice Tab -->
+          <section id="practice" class="tab-content">
+            <div class="section-header">
+              <h2><i class="ph ph-pencil-circle"></i> Luyện tập</h2>
+              <p class="section-subtitle">Chọn đề thi và bắt đầu luyện tập</p>
+            </div>
+
+            <!-- Test Selector -->
+            <div class="card">
+              <div class="card-header">
+                <h3>📚 Chọn đề thi</h3>
+                <div class="header-actions">
+                  <select id="testSourceFilter" class="select-sm">
+                    <option value="all">Tất cả nguồn</option>
+                    <option value="cambridge">Cambridge</option>
+                    <option value="british-council">British Council</option>
+                    <option value="ielts-official">IELTS Official</option>
+                    <option value="custom">Đề tự tạo</option>
+                  </select>
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="App.switchTab('upload')"
+                  >
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="App.switchTab('upload')"
+                  >
+                    <i class="ph ph-plus"></i> Tạo đề mới
+                  </button>
+                </div>
+              </div>
+              <p class="hint-text">
+                <i class="ph ph-lightbulb"></i> Click vào đề thi để chọn, sau đó chọn "Full Test" hoặc dạng
+                bài cụ thể
+              </p>
+              <div class="test-selector-grid" id="testSelectorGrid">
+                <p class="empty-state">Đang tải danh sách đề thi...</p>
+              </div>
+            </div>
+
+            <!-- Practice Options (Hidden until test selected) -->
+            <div id="testConfigSection" style="display: none">
+              <!-- Question Types Available in Selected Test -->
+              <div class="card">
+                <div class="card-header">
+                  <h3><i class="ph ph-list-checks"></i> Các dạng câu hỏi có trong đề</h3>
+                  <span class="selected-test-name" id="selectedTestName"
+                    >-</span
+                  >
+                </div>
+                <p class="hint-text">
+                  <i class="ph ph-lightbulb"></i> Chỉ hiển thị những dạng bài có trong đề đã chọn
+                </p>
+                <div class="question-types-grid" id="questionTypesGrid">
+                  <!-- Will be populated dynamically -->
+                </div>
+              </div>
+
+              <!-- Timer Settings -->
+              <div class="card timer-config-card">
+                <div class="card-header">
+                  <h3><i class="ph ph-timer"></i> Cài đặt thời gian</h3>
+                </div>
+                <div class="timer-options">
+                  <label class="timer-option">
+                    <input
+                      type="radio"
+                      name="timerMode"
+                      value="standard"
+                      checked
+                    />
+                    <span class="option-content">
+                      <span class="option-title"><i class="ph ph-clipboard-text"></i> Chuẩn (60 phút)</span>
+                      <span class="option-desc">Như trong kỳ thi thật</span>
+                    </span>
+                  </label>
+                  <label class="timer-option">
+                    <input type="radio" name="timerMode" value="relaxed" />
+                    <span class="option-content">
+                      <span class="option-title"><i class="ph ph-coffee"></i> Thoải mái (90 phút)</span>
+                      <span class="option-desc"
+                        >Thêm thời gian để làm quen</span
+                      >
+                    </span>
+                  </label>
+                  <label class="timer-option">
+                    <input type="radio" name="timerMode" value="unlimited" />
+                    <span class="option-content">
+                      <span class="option-title"><i class="ph ph-infinity"></i> Không giới hạn</span>
+                      <span class="option-desc">Luyện không có áp lực</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Start Button -->
+              <div class="start-practice-section">
+                <button
+                  class="btn btn-primary btn-large btn-start"
+                  id="startPracticeBtn"
+                  onclick="Practice.startSelectedTest()"
+                >
+                  id="startPracticeBtn"
+                  onclick="Practice.startSelectedTest()"
+                >
+                  <i class="ph ph-rocket-launch"></i> Bắt đầu luyện tập
                 </button>
+                <button
+                  class="btn btn-success btn-large btn-start"
+                  onclick="Practice.startFullscreen()"
+                >
+                  class="btn btn-success btn-large btn-start"
+                  onclick="Practice.startFullscreen()"
+                >
+                  <i class="ph ph-desktop"></i> Chế độ Full Screen (Như thi thật)
+                </button>
+              </div>
             </div>
-            
-            <nav class="sidebar-nav">
-                <div class="nav-section">
-                    <span class="nav-section-title">Main</span>
-                    <button class="nav-item active" data-tab="dashboard">
-                        <span class="nav-icon">📊</span>
-                        <span class="nav-label">Dashboard</span>
-                    </button>
-                    <button class="nav-item" data-tab="practice">
-                        <span class="nav-icon">📝</span>
-                        <span class="nav-label">Luyện tập</span>
-                    </button>
-                    <button class="nav-item" data-tab="library">
-                        <span class="nav-icon">📚</span>
-                        <span class="nav-label">Thư viện đề</span>
-                    </button>
+
+            <!-- Practice Area (Hidden initially) -->
+            <div id="practiceArea" style="display: none">
+              <div class="timer-section card" id="timerSection">
+                <div class="timer-display-wrapper">
+                  <div class="timer-display" id="timerDisplay">60:00</div>
+                  <div class="timer-controls">
+                    <button class="btn btn-success" id="startTimer"><i class="ph ph-play"></i></button>
+                    <button class="btn btn-warning" id="pauseTimer"><i class="ph ph-pause"></i></button>
+                    <button class="btn btn-primary" id="resetTimer"><i class="ph ph-arrow-counter-clockwise"></i></button>
+                  </div>
                 </div>
-                
-                <div class="nav-section">
-                    <span class="nav-section-title">Practice Modes</span>
-                    <button class="nav-item" data-tab="minitest">
-                        <span class="nav-icon">⏱️</span>
-                        <span class="nav-label">Mini-Test</span>
-                        <span class="nav-badge">New</span>
-                    </button>
-                    <button class="nav-item" data-tab="drill">
-                        <span class="nav-icon">🔥</span>
-                        <span class="nav-label">Drill Mode</span>
-                        <span class="nav-badge">New</span>
-                    </button>
-                </div>
-                
-                <div class="nav-section">
-                    <span class="nav-section-title">Learning</span>
-                    <button class="nav-item" data-tab="vocabulary">
-                        <span class="nav-icon">📖</span>
-                        <span class="nav-label">Từ vựng</span>
-                    </button>
-                    <button class="nav-item" data-tab="errors">
-                        <span class="nav-icon">❌</span>
-                        <span class="nav-label">Lỗi sai</span>
-                    </button>
-                    <button class="nav-item" data-tab="aianalysis">
-                        <span class="nav-icon">🤖</span>
-                        <span class="nav-label">AI Phân tích</span>
-                        <span class="nav-badge hot">Hot</span>
-                    </button>
-                </div>
-                
-                <div class="nav-section">
-                    <span class="nav-section-title">Settings</span>
-                    <button class="nav-item" data-tab="upload">
-                        <span class="nav-icon">📤</span>
-                        <span class="nav-label">Upload/Tạo đề</span>
-                    </button>
-                    <button class="nav-item" data-tab="settings">
-                        <span class="nav-icon">⚙️</span>
-                        <span class="nav-label">Cài đặt</span>
-                    </button>
-                </div>
-            </nav>
-            
-            <div class="sidebar-footer">
-                <div class="user-progress">
-                    <div class="progress-circle" id="sidebarProgress">
-                        <svg viewBox="0 0 36 36">
-                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                            <path class="circle-progress" stroke-dasharray="45, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                        </svg>
-                        <span class="progress-text">45%</span>
+              </div>
+
+              <div class="passage-container" id="passageContainer">
+                <div class="passage-panel">
+                  <div class="passage-header">
+                    <h3>Passage <span id="passageNumber">1</span></h3>
+                    <div class="highlight-controls">
+                      <span class="highlight-label">Highlight:</span>
+                      <button
+                        class="btn btn-sm highlight-btn active"
+                        data-color="yellow"
+                        title="Yellow"
+                      >
+                      >
+                        <div style="width: 12px; height: 12px; background: #ffff00;border-radius:2px;"></div>
+                      </button>
+                      <button
+                        class="btn btn-sm highlight-btn"
+                        data-color="green"
+                        title="Green"
+                      >
+                      >
+                        <div style="width: 12px; height: 12px; background: #00ff00;border-radius:2px;"></div>
+                      </button>
+                      <button
+                        class="btn btn-sm highlight-btn"
+                        data-color="blue"
+                        title="Blue"
+                      >
+                      >
+                        <div style="width: 12px; height: 12px; background: #0000ff;border-radius:2px;"></div>
+                      </button>
+                      <button
+                        class="btn btn-sm highlight-btn"
+                        data-color="pink"
+                        title="Pink"
+                      >
+                        title="Pink"
+                      >
+                        <div style="width: 12px; height: 12px; background: #FFC0CB;border-radius:2px;"></div>
+                      </button>
+                      <button
+                        class="btn btn-sm"
+                        id="clearHighlights"
+                        title="Clear"
+                      >
+                        <i class="ph ph-trash"></i>
+                      </button>
                     </div>
-                    <div class="user-info">
-                        <span class="user-level">Band hiện tại</span>
-                        <span class="user-band" id="currentBandSidebar">6.5</span>
-                    </div>
+                  </div>
+                  <div class="highlight-tip">
+                    <i class="ph ph-lightbulb"></i> <strong>Tip:</strong> Chọn màu → Drag chuột chọn text →
+                    Double-click để xóa highlight
+                  </div>
+                  <div class="passage-content" id="passageContent">
+                    <!-- Content loaded dynamically -->
+                  </div>
                 </div>
-                <div class="streak-info">
-                    <span class="streak-icon">🔥</span>
-                    <span class="streak-count" id="streakCount">0</span>
-                    <span class="streak-label">ngày liên tục</span>
+
+                <div class="questions-panel">
+                  <div class="questions-header">
+                    <h3>Questions</h3>
+                    <span class="question-count" id="questionCount">0/0</span>
+                  </div>
+                  <div class="questions-content" id="questionsContent">
+                    <!-- Questions loaded dynamically -->
+                  </div>
+                  <button class="btn btn-primary btn-large" id="submitAnswers">
+                    <button class="btn btn-primary btn-large" id="submitAnswers">
+                    <i class="ph ph-paper-plane-right"></i> Nộp bài
+                  </button>
                 </div>
+              </div>
             </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <!-- Top Bar -->
-            <header class="topbar">
-                <div class="topbar-left">
-                    <button class="mobile-menu-btn" id="mobileMenuBtn">
-                        <span></span><span></span><span></span>
-                    </button>
-                    <div class="breadcrumb">
-                        <span id="currentSection">Dashboard</span>
-                    </div>
-                </div>
-                <div class="topbar-right">
-                    <div class="quick-stats">
-                        <div class="quick-stat">
-                            <span class="stat-icon">📝</span>
-                            <span class="stat-value" id="topbarTests">0</span>
-                        </div>
-                        <div class="quick-stat">
-                            <span class="stat-icon">⏱️</span>
-                            <span class="stat-value" id="topbarTime">0h</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary btn-quick-practice" onclick="App.startQuickPractice()">
-                        ⚡ Luyện tập nhanh
-                    </button>
-                </div>
-            </header>
-
-            <!-- Content Container -->
-            <div class="content-wrapper">
-                <!-- Dashboard Tab -->
-                <section id="dashboard" class="tab-content active">
-                    <div class="section-header">
-                        <h2>📊 Tổng quan tiến độ</h2>
-                        <p class="section-subtitle">Theo dõi hành trình chinh phục IELTS Reading của bạn</p>
-                    </div>
-                    
-                    <div class="dashboard-grid">
-                        <!-- Main Stats Cards -->
-                        <div class="stats-row">
-                            <div class="stat-card gradient-primary">
-                                <div class="stat-card-icon">📋</div>
-                                <div class="stat-card-content">
-                                    <span class="stat-card-value" id="completedTests">0</span>
-                                    <span class="stat-card-label">Bài đã hoàn thành</span>
-                                </div>
-                            </div>
-                            <div class="stat-card gradient-success">
-                                <div class="stat-card-icon">🎯</div>
-                                <div class="stat-card-content">
-                                    <span class="stat-card-value" id="averageScore">0.0</span>
-                                    <span class="stat-card-label">Band trung bình</span>
-                                </div>
-                            </div>
-                            <div class="stat-card gradient-info">
-                                <div class="stat-card-icon">⏰</div>
-                                <div class="stat-card-content">
-                                    <span class="stat-card-value" id="totalTime">0h</span>
-                                    <span class="stat-card-label">Thời gian luyện</span>
-                                </div>
-                            </div>
-                            <div class="stat-card gradient-warning">
-                                <div class="stat-card-icon">📚</div>
-                                <div class="stat-card-content">
-                                    <span class="stat-card-value" id="vocabCount">0</span>
-                                    <span class="stat-card-label">Từ vựng đã học</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Progress Section -->
-                        <div class="card-row">
-                            <div class="card full-width">
-                                <div class="card-header">
-                                    <h3>📈 Tiến độ học tập</h3>
-                                    <span class="target-badge">Target: Band <strong id="targetBandDisplay">8.0</strong></span>
-                                </div>
-                                <div class="progress-section">
-                                    <div class="progress-bar large">
-                                        <div class="progress-fill" id="overallProgress" style="width: 45%">
-                                            <span>45%</span>
-                                        </div>
-                                    </div>
-                                    <div class="progress-milestones">
-                                        <span class="milestone" style="left: 25%">Band 6</span>
-                                        <span class="milestone" style="left: 50%">Band 7</span>
-                                        <span class="milestone" style="left: 75%">Band 8</span>
-                                        <span class="milestone" style="left: 100%">Band 9</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Two Column Layout -->
-                        <div class="card-row two-col">
-                            <!-- Weakness Analysis -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>⚠️ Dạng bài cần cải thiện</h3>
-                                    <button class="btn btn-sm btn-ghost" onclick="Dashboard.refreshWeaknesses()">↻</button>
-                                </div>
-                                <div class="weakness-list" id="weaknessList">
-                                    <p class="empty-state">Hoàn thành thêm bài test để phân tích</p>
-                                </div>
-                            </div>
-
-                            <!-- Recent Activity -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3>📅 Hoạt động gần đây</h3>
-                                </div>
-                                <div class="activity-list" id="recentActivity">
-                                    <p class="empty-state">Chưa có hoạt động nào</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Actions -->
-                        <div class="card-row">
-                            <div class="card full-width">
-                                <div class="card-header">
-                                    <h3>🚀 Bắt đầu học ngay</h3>
-                                </div>
-                                <div class="quick-actions-grid">
-                                    <button class="quick-action-card" onclick="App.switchTab('practice')">
-                                        <span class="action-icon">📝</span>
-                                        <span class="action-title">Full Test</span>
-                                        <span class="action-desc">Luyện đề hoàn chỉnh</span>
-                                    </button>
-                                    <button class="quick-action-card" onclick="App.switchTab('minitest')">
-                                        <span class="action-icon">⏱️</span>
-                                        <span class="action-title">Mini-Test</span>
-                                        <span class="action-desc">13 câu / 15 phút</span>
-                                    </button>
-                                    <button class="quick-action-card" onclick="App.switchTab('drill')">
-                                        <span class="action-icon">🔥</span>
-                                        <span class="action-title">Drill</span>
-                                        <span class="action-desc">Luyện dạng bài yếu</span>
-                                    </button>
-                                    <button class="quick-action-card" onclick="App.switchTab('aianalysis')">
-                                        <span class="action-icon">🤖</span>
-                                        <span class="action-title">AI Analysis</span>
-                                        <span class="action-desc">Phân tích điểm yếu</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Practice Tab -->
-                <section id="practice" class="tab-content">
-                    <div class="section-header">
-                        <h2>📝 Luyện tập</h2>
-                        <p class="section-subtitle">Chọn đề thi và bắt đầu luyện tập</p>
-                    </div>
-
-                    <!-- Test Selector -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>📚 Chọn đề thi</h3>
-                            <div class="header-actions">
-                                <select id="testSourceFilter" class="select-sm">
-                                    <option value="all">Tất cả nguồn</option>
-                                    <option value="cambridge">Cambridge</option>
-                                    <option value="british-council">British Council</option>
-                                    <option value="ielts-official">IELTS Official</option>
-                                    <option value="custom">Đề tự tạo</option>
-                                </select>
-                                <button class="btn btn-primary btn-sm" onclick="App.switchTab('upload')">
-                                    ➕ Tạo đề mới
-                                </button>
-                            </div>
-                        </div>
-                        <p class="hint-text">💡 Click vào đề thi để chọn, sau đó chọn "Full Test" hoặc dạng bài cụ thể</p>
-                        <div class="test-selector-grid" id="testSelectorGrid">
-                            <p class="empty-state">Đang tải danh sách đề thi...</p>
-                        </div>
-                    </div>
-
-                    <!-- Practice Options (Hidden until test selected) -->
-                    <div id="testConfigSection" style="display: none;">
-                        <!-- Question Types Available in Selected Test -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>🎯 Các dạng câu hỏi có trong đề</h3>
-                                <span class="selected-test-name" id="selectedTestName">-</span>
-                            </div>
-                            <p class="hint-text">💡 Chỉ hiển thị những dạng bài có trong đề đã chọn</p>
-                            <div class="question-types-grid" id="questionTypesGrid">
-                                <!-- Will be populated dynamically -->
-                            </div>
-                        </div>
-
-                        <!-- Timer Settings -->
-                        <div class="card timer-config-card">
-                            <div class="card-header">
-                                <h3>⏱️ Cài đặt thời gian</h3>
-                            </div>
-                            <div class="timer-options">
-                                <label class="timer-option">
-                                    <input type="radio" name="timerMode" value="standard" checked>
-                                    <span class="option-content">
-                                        <span class="option-title">📋 Chuẩn (60 phút)</span>
-                                        <span class="option-desc">Như trong kỳ thi thật</span>
-                                    </span>
-                                </label>
-                                <label class="timer-option">
-                                    <input type="radio" name="timerMode" value="relaxed">
-                                    <span class="option-content">
-                                        <span class="option-title">😌 Thoải mái (90 phút)</span>
-                                        <span class="option-desc">Thêm thời gian để làm quen</span>
-                                    </span>
-                                </label>
-                                <label class="timer-option">
-                                    <input type="radio" name="timerMode" value="unlimited">
-                                    <span class="option-content">
-                                        <span class="option-title">∞ Không giới hạn</span>
-                                        <span class="option-desc">Luyện không có áp lực</span>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Start Button -->
-                        <div class="start-practice-section">
-                            <button class="btn btn-primary btn-large btn-start" id="startPracticeBtn" onclick="Practice.startSelectedTest()">
-                                🚀 Bắt đầu luyện tập
-                            </button>
-                            <button class="btn btn-success btn-large btn-start" onclick="Practice.startFullscreen()">
-                                🖥️ Chế độ Full Screen (Như thi thật)
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Practice Area (Hidden initially) -->
-                    <div id="practiceArea" style="display: none;">
-                        <div class="timer-section card" id="timerSection">
-                            <div class="timer-display-wrapper">
-                                <div class="timer-display" id="timerDisplay">60:00</div>
-                                <div class="timer-controls">
-                                    <button class="btn btn-success" id="startTimer">▶️</button>
-                                    <button class="btn btn-warning" id="pauseTimer">⏸️</button>
-                                    <button class="btn btn-primary" id="resetTimer">🔄</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="passage-container" id="passageContainer">
-                            <div class="passage-panel">
-                                <div class="passage-header">
-                                    <h3>Passage <span id="passageNumber">1</span></h3>
-                                    <div class="highlight-controls">
-                                        <span class="highlight-label">Highlight:</span>
-                                        <button class="btn btn-sm highlight-btn active" data-color="yellow" title="Yellow">🟨</button>
-                                        <button class="btn btn-sm highlight-btn" data-color="green" title="Green">🟩</button>
-                                        <button class="btn btn-sm highlight-btn" data-color="blue" title="Blue">🟦</button>
-                                        <button class="btn btn-sm highlight-btn" data-color="pink" title="Pink">🟪</button>
-                                        <button class="btn btn-sm" id="clearHighlights" title="Clear">🗑️</button>
-                                    </div>
-                                </div>
-                                <div class="highlight-tip">
-                                    💡 <strong>Tip:</strong> Chọn màu → Drag chuột chọn text → Double-click để xóa highlight
-                                </div>
-                                <div class="passage-content" id="passageContent">
-                                    <!-- Content loaded dynamically -->
-                                </div>
-                            </div>
-                            
-                            <div class="questions-panel">
-                                <div class="questions-header">
-                                    <h3>Questions</h3>
-                                    <span class="question-count" id="questionCount">0/0</span>
-                                </div>
-                                <div class="questions-content" id="questionsContent">
-                                    <!-- Questions loaded dynamically -->
-                                </div>
-                                <button class="btn btn-primary btn-large" id="submitAnswers">📤 Nộp bài</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Library Tab -->
-                <section id="library" class="tab-content">
-                    <div class="section-header">
-                        <h2>📚 Thư viện đề thi</h2>
-                        <p class="section-subtitle">Tất cả đề thi từ các nguồn uy tín</p>
-                    </div>
-
-                    <!-- Source Tabs -->
-                    <div class="source-tabs">
-                        <button class="source-tab active" data-source="all">Tất cả</button>
-                        <button class="source-tab" data-source="cambridge">
-                            <span class="source-logo">🏛️</span> Cambridge
-                        </button>
-                        <button class="source-tab" data-source="british-council">
-                            <span class="source-logo">🇬🇧</span> British Council
-                        </button>
-                        <button class="source-tab" data-source="ielts-official">
-                            <span class="source-logo">📘</span> IELTS Official
-                        </button>
-                        <button class="source-tab" data-source="custom">
-                            <span class="source-logo">✨</span> Đề tự tạo
-                        </button>
-                    </div>
-
-                    <!-- Library Grid -->
-                    <div class="library-grid" id="libraryGrid">
-                        <!-- Populated dynamically -->
-                    </div>
-                </section>
-
-                <!-- Mini-Test Tab -->
-                <section id="minitest" class="tab-content">
-                    <div class="section-header">
-                        <h2>⏱️ Mini-Test</h2>
-                        <p class="section-subtitle">Luyện tập nhanh với 13 câu hỏi trong 15 phút</p>
-                    </div>
-
-                    <div class="minitest-options">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>🎯 Chọn chế độ Mini-Test</h3>
-                            </div>
-                            <div class="minitest-modes-grid">
-                                <button class="minitest-mode-card" onclick="MiniTest.start('random')">
-                                    <span class="mode-icon">🎲</span>
-                                    <span class="mode-title">Random Mix</span>
-                                    <span class="mode-desc">13 câu ngẫu nhiên từ nhiều dạng</span>
-                                    <span class="mode-time">15 phút</span>
-                                </button>
-                                <button class="minitest-mode-card" onclick="MiniTest.start('tfng')">
-                                    <span class="mode-icon">✓✗</span>
-                                    <span class="mode-title">T/F/NG Focus</span>
-                                    <span class="mode-desc">Tập trung True/False/Not Given</span>
-                                    <span class="mode-time">15 phút</span>
-                                </button>
-                                <button class="minitest-mode-card" onclick="MiniTest.start('matching')">
-                                    <span class="mode-icon">🔗</span>
-                                    <span class="mode-title">Matching Focus</span>
-                                    <span class="mode-desc">Matching Headings/Info</span>
-                                    <span class="mode-time">15 phút</span>
-                                </button>
-                                <button class="minitest-mode-card" onclick="MiniTest.start('completion')">
-                                    <span class="mode-icon">✍️</span>
-                                    <span class="mode-title">Completion Focus</span>
-                                    <span class="mode-desc">Summary/Sentence Completion</span>
-                                    <span class="mode-time">15 phút</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Mini-Test History -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>📊 Lịch sử Mini-Test</h3>
-                            </div>
-                            <div class="minitest-history" id="minitestHistory">
-                                <p class="empty-state">Chưa có kết quả Mini-Test nào</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Drill Tab -->
-                <section id="drill" class="tab-content">
-                    <div class="section-header">
-                        <h2>🔥 Drill Mode</h2>
-                        <p class="section-subtitle">Luyện tập chuyên sâu từng dạng bài</p>
-                    </div>
-
-                    <div class="drill-container">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>⚡ Chọn dạng bài để drill</h3>
-                            </div>
-                            <p class="hint-text">💡 Drill mode sẽ cho bạn làm liên tục nhiều câu cùng dạng để thành thạo</p>
-                            
-                            <div class="drill-types-grid" id="drillTypesGrid">
-                                <button class="drill-type-card" onclick="Drill.start('tfng')">
-                                    <div class="drill-icon">✓✗</div>
-                                    <div class="drill-info">
-                                        <h4>True/False/Not Given</h4>
-                                        <p>Xác định thông tin đúng/sai</p>
-                                        <div class="drill-stats">
-                                            <span class="accuracy" id="drillAccTfng">--</span>
-                                            <span class="total">câu đã làm</span>
-                                        </div>
-                                    </div>
-                                    <div class="difficulty-indicator">
-                                        <span class="dot hard"></span>
-                                        <span class="label">Khó</span>
-                                    </div>
-                                </button>
-
-                                <button class="drill-type-card" onclick="Drill.start('ynng')">
-                                    <div class="drill-icon">❓</div>
-                                    <div class="drill-info">
-                                        <h4>Yes/No/Not Given</h4>
-                                        <p>Quan điểm của tác giả</p>
-                                        <div class="drill-stats">
-                                            <span class="accuracy" id="drillAccYnng">--</span>
-                                            <span class="total">câu đã làm</span>
-                                        </div>
-                                    </div>
-                                    <div class="difficulty-indicator">
-                                        <span class="dot hard"></span>
-                                        <span class="label">Khó</span>
-                                    </div>
-                                </button>
-
-                                <button class="drill-type-card" onclick="Drill.start('matching-headings')">
-                                    <div class="drill-icon">📑</div>
-                                    <div class="drill-info">
-                                        <h4>Matching Headings</h4>
-                                        <p>Ghép tiêu đề đoạn văn</p>
-                                        <div class="drill-stats">
-                                            <span class="accuracy" id="drillAccHeadings">--</span>
-                                            <span class="total">câu đã làm</span>
-                                        </div>
-                                    </div>
-                                    <div class="difficulty-indicator">
-                                        <span class="dot medium"></span>
-                                        <span class="label">Trung bình</span>
-                                    </div>
-                                </button>
-
-                                <button class="drill-type-card" onclick="Drill.start('multiple-choice')">
-                                    <div class="drill-icon">📝</div>
-                                    <div class="drill-info">
-                                        <h4>Multiple Choice</h4>
-                                        <p>Câu hỏi trắc nghiệm</p>
-                                        <div class="drill-stats">
-                                            <span class="accuracy" id="drillAccMc">--</span>
-                                            <span class="total">câu đã làm</span>
-                                        </div>
-                                    </div>
-                                    <div class="difficulty-indicator">
-                                        <span class="dot easy"></span>
-                                        <span class="label">Dễ</span>
-                                    </div>
-                                </button>
-
-                                <button class="drill-type-card" onclick="Drill.start('summary')">
-                                    <div class="drill-icon">📋</div>
-                                    <div class="drill-info">
-                                        <h4>Summary Completion</h4>
-                                        <p>Hoàn thành tóm tắt</p>
-                                        <div class="drill-stats">
-                                            <span class="accuracy" id="drillAccSummary">--</span>
-                                            <span class="total">câu đã làm</span>
-                                        </div>
-                                    </div>
-                                    <div class="difficulty-indicator">
-                                        <span class="dot medium"></span>
-                                        <span class="label">Trung bình</span>
-                                    </div>
-                                </button>
-
-                                <button class="drill-type-card" onclick="Drill.start('sentence')">
-                                    <div class="drill-icon">✍️</div>
-                                    <div class="drill-info">
-                                        <h4>Sentence Completion</h4>
-                                        <p>Hoàn thành câu</p>
-                                        <div class="drill-stats">
-                                            <span class="accuracy" id="drillAccSentence">--</span>
-                                            <span class="total">câu đã làm</span>
-                                        </div>
-                                    </div>
-                                    <div class="difficulty-indicator">
-                                        <span class="dot medium"></span>
-                                        <span class="label">Trung bình</span>
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Vocabulary Tab -->
-                <section id="vocabulary" class="tab-content">
-                    <div class="section-header">
-                        <h2>📖 Kho từ vựng</h2>
-                        <p class="section-subtitle">Quản lý và ôn tập từ vựng IELTS</p>
-                    </div>
-
-                    <!-- Learning Modes -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>🎯 Chế độ học</h3>
-                        </div>
-                        <div class="vocab-quick-actions">
-                            <button class="vocab-mode-btn" onclick="Flashcard.start('all')">
-                                🎴 Flashcard - Tất cả từ
-                            </button>
-                            <button class="vocab-mode-btn" onclick="Flashcard.start('new')">
-                                ✨ Flashcard - Từ mới
-                            </button>
-                            <button class="vocab-mode-btn" onclick="Flashcard.start('weak')">
-                                💪 Flashcard - Từ yếu
-                            </button>
-                            <button class="vocab-mode-btn" onclick="VocabQuiz.start('multiple-choice', 10)">
-                                📝 Quiz - Trắc nghiệm (10 câu)
-                            </button>
-                            <button class="vocab-mode-btn" onclick="VocabQuiz.start('typing', 10)">
-                                ✍️ Quiz - Tự luận (10 câu)
-                            </button>
-                            <button class="vocab-mode-btn" onclick="VocabQuiz.start('mixed', 15)">
-                                🎲 Quiz - Hỗn hợp (15 câu)
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>➕ Thêm từ mới</h3>
-                        </div>
-                        <div class="vocab-add-form">
-                            <input type="text" id="newWord" class="input" placeholder="Từ vựng..." required>
-                            <input type="text" id="newMeaning" class="input" placeholder="Nghĩa..." required>
-                            <input type="text" id="newExample" class="input" placeholder="Ví dụ (tùy chọn)...">
-                            <select id="newTopic" class="select">
-                                <option value="general">📝 Tổng quát</option>
-                                <option value="education">🎓 Giáo dục</option>
-                                <option value="environment">🌱 Môi trường</option>
-                                <option value="technology">💻 Công nghệ</option>
-                                <option value="health">🏥 Sức khỏe</option>
-                                <option value="business">💼 Kinh doanh</option>
-                                <option value="culture">🎭 Văn hóa</option>
-                                <option value="science">🔬 Khoa học</option>
-                                <option value="society">👥 Xã hội</option>
-                                <option value="travel">✈️ Du lịch</option>
-                                <option value="sport">⚽ Thể thao</option>
-                                <option value="art">🎨 Nghệ thuật</option>
-                                <option value="media">📺 Truyền thông</option>
-                            </select>
-                            <button class="btn btn-primary" id="addVocabBtn">➕ Thêm</button>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>🔍 Tìm kiếm & Lọc</h3>
-                        </div>
-                        <div class="vocab-search-bar">
-                            <input type="text" id="searchVocab" class="input" placeholder="🔍 Tìm kiếm từ vựng...">
-                            <select id="topicFilter" class="select">
-                                <option value="all">📚 Tất cả chủ đề</option>
-                                <option value="general">📝 Tổng quát</option>
-                                <option value="education">🎓 Giáo dục</option>
-                                <option value="environment">🌱 Môi trường</option>
-                                <option value="technology">💻 Công nghệ</option>
-                                <option value="health">🏥 Sức khỏe</option>
-                                <option value="business">💼 Kinh doanh</option>
-                                <option value="culture">🎭 Văn hóa</option>
-                                <option value="science">🔬 Khoa học</option>
-                                <option value="society">👥 Xã hội</option>
-                                <option value="travel">✈️ Du lịch</option>
-                                <option value="sport">⚽ Thể thao</option>
-                                <option value="art">🎨 Nghệ thuật</option>
-                                <option value="media">📺 Truyền thông</option>
-                            </select>
-                            <select id="sortVocab" class="select">
-                                <option value="newest">Mới nhất</option>
-                                <option value="oldest">Cũ nhất</option>
-                                <option value="alphabetical">A-Z</option>
-                            </select>
-                        </div>
-                        <div class="vocab-display-options">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="groupByTopic">
-                                <span>📂 Nhóm theo chủ đề</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Topic Statistics -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>📊 Thống kê theo chủ đề</h3>
-                        </div>
-                        <div class="topic-stats-container" id="topicStatsContainer">
-                            <p class="empty-state">Chưa có thống kê</p>
-                        </div>
-                    </div>
-
-                    <div class="vocab-list-container">
-                        <div class="vocab-list" id="vocabList">
-                            <p class="empty-state">Chưa có từ vựng nào. Hãy thêm từ mới!</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Errors Tab -->
-                <section id="errors" class="tab-content">
-                    <div class="section-header">
-                        <h2>❌ Nhật ký lỗi sai</h2>
-                        <p class="section-subtitle">Phân tích và học từ các lỗi sai</p>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>📊 Thống kê lỗi</h3>
-                            <button class="btn btn-sm btn-danger" id="clearErrors">🗑️ Xóa tất cả</button>
-                        </div>
-                        <div class="error-stats-grid">
-                            <div class="error-stat-box">
-                                <span class="error-stat-value" id="totalErrors">0</span>
-                                <span class="error-stat-label">Tổng lỗi</span>
-                            </div>
-                            <div class="error-stat-box">
-                                <span class="error-stat-value" id="mostCommonError">-</span>
-                                <span class="error-stat-label">Lỗi thường gặp nhất</span>
-                            </div>
-                            <div class="error-stat-box">
-                                <span class="error-stat-value" id="errorRate">-</span>
-                                <span class="error-stat-label">Tỷ lệ lỗi</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="error-log" id="errorLog">
-                        <p class="empty-state">Chưa có lỗi nào được ghi nhận</p>
-                    </div>
-                </section>
-
-                <!-- AI Analysis Tab -->
-                <section id="aianalysis" class="tab-content">
-                    <div class="section-header">
-                        <h2>🤖 AI Phân tích</h2>
-                        <p class="section-subtitle">Phân tích thông minh dựa trên lịch sử học tập của bạn</p>
-                    </div>
-
-                    <div class="ai-analysis-container">
-                        <div class="card ai-main-card">
-                            <div class="card-header">
-                                <h3>✨ Báo cáo phân tích AI</h3>
-                                <button class="btn btn-primary" onclick="AIAnalysis.generate()" id="generateAIBtn">
-                                    🔮 Tạo phân tích mới
-                                </button>
-                            </div>
-                            <div class="ai-analysis-content" id="aiAnalysisContent">
-                                <div class="ai-placeholder">
-                                    <div class="ai-icon">🤖</div>
-                                    <h3>AI sẵn sàng phân tích</h3>
-                                    <p>Nhấn "Tạo phân tích mới" để AI đánh giá năng lực và đề xuất lộ trình cải thiện band score.</p>
-                                    <ul class="ai-features">
-                                        <li>🎯 Phân tích điểm mạnh/yếu</li>
-                                        <li>📊 Đánh giá từng dạng câu hỏi</li>
-                                        <li>📈 Đề xuất lộ trình cải thiện</li>
-                                        <li>💡 Mẹo làm bài hiệu quả</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>📊 Thống kê theo dạng bài</h3>
-                            </div>
-                            <div class="question-type-stats" id="questionTypeStats">
-                                <!-- Populated dynamically -->
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Upload Tab -->
-                <section id="upload" class="tab-content">
-                    <div class="section-header">
-                        <h2>📤 Tạo đề thi mới</h2>
-                        <p class="section-subtitle">Upload file hoặc nhập trực tiếp để tạo đề</p>
-                    </div>
-
-                    <!-- Tab Switch for Upload Methods -->
-                    <div class="upload-method-tabs">
-                        <button class="method-tab active" data-method="manual">
-                            ✍️ Nhập trực tiếp
-                        </button>
-                        <button class="method-tab" data-method="upload">
-                            📄 Upload file
-                        </button>
-                        <button class="method-tab" data-method="ai-generator">
-                            🤖 AI Tạo đề
-                        </button>
-                    </div>
-
-                    <!-- Manual Entry Method -->
-                    <div id="manualEntrySection" class="upload-method-content active">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>📝 Thông tin đề thi</h3>
-                            </div>
-                            <div class="manual-form">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Tên đề thi <span class="required">*</span></label>
-                                        <input type="text" id="manualTestTitle" class="input" placeholder="VD: Cambridge 18 - Test 1">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Nguồn đề</label>
-                                        <select id="manualTestSource" class="select">
-                                            <option value="custom">Tự tạo</option>
-                                            <option value="cambridge">Cambridge</option>
-                                            <option value="british-council">British Council</option>
-                                            <option value="ielts-official">IELTS Official</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Band Level</label>
-                                        <select id="manualTestLevel" class="select">
-                                            <option value="5.0">Band 5.0</option>
-                                            <option value="6.0">Band 6.0</option>
-                                            <option value="6.5">Band 6.5</option>
-                                            <option value="7.0" selected>Band 7.0</option>
-                                            <option value="7.5">Band 7.5</option>
-                                            <option value="8.0">Band 8.0</option>
-                                            <option value="8.5">Band 8.5</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Passage Entry -->
-                        <div class="card passage-entry-card">
-                            <div class="card-header">
-                                <h3>📖 Passage</h3>
-                                <div class="passage-tabs" id="passageTabs">
-                                    <button class="passage-tab active" data-passage="1">Passage 1</button>
-                                    <button class="passage-tab" data-passage="2">Passage 2</button>
-                                    <button class="passage-tab" data-passage="3">Passage 3</button>
-                                </div>
-                            </div>
-                            
-                            <div class="passage-input-container">
-                                <div class="form-group">
-                                    <label>Tiêu đề Passage <span class="required">*</span></label>
-                                    <input type="text" id="passageTitle" class="input" placeholder="VD: The History of Coffee">
-                                </div>
-                                <div class="form-group">
-                                    <label>Nội dung Passage <span class="required">*</span></label>
-                                    <textarea id="passageText" class="textarea passage-textarea" placeholder="Dán nội dung passage vào đây... 
-
-Tip: Bạn có thể copy/paste trực tiếp từ PDF hoặc website."></textarea>
-                                    <div class="textarea-stats">
-                                        <span id="passageWordCount">0 từ</span>
-                                        <span id="passageCharCount">0 ký tự</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Questions Entry -->
-                        <div class="card questions-entry-card">
-                            <div class="card-header">
-                                <h3>❓ Câu hỏi</h3>
-                                <button class="btn btn-sm btn-success" id="addQuestionBtn">➕ Thêm câu hỏi</button>
-                            </div>
-                            
-                            <div class="questions-input-container" id="questionsInputContainer">
-                                <!-- Question template will be added here -->
-                                <div class="question-entry" data-question-id="1">
-                                    <div class="question-header">
-                                        <span class="question-number">Câu 1</span>
-                                        <select class="select question-type-select">
-                                            <option value="tfng">True/False/Not Given</option>
-                                            <option value="ynng">Yes/No/Not Given</option>
-                                            <option value="multiple-choice">Multiple Choice</option>
-                                            <option value="matching-headings">Matching Headings</option>
-                                            <option value="summary">Summary Completion</option>
-                                            <option value="sentence">Sentence Completion</option>
-                                        </select>
-                                        <button class="btn btn-sm btn-danger remove-question-btn">🗑️</button>
-                                    </div>
-                                    <div class="question-body">
-                                        <input type="text" class="input question-text-input" placeholder="Nội dung câu hỏi...">
-                                        <div class="answer-row">
-                                            <input type="text" class="input answer-input" placeholder="Đáp án đúng">
-                                            <input type="text" class="input explanation-input" placeholder="Giải thích (tùy chọn)">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button class="btn btn-primary btn-large save-test-btn" onclick="ManualEntry.saveTest()">
-                                💾 Lưu đề thi
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- File Upload Method -->
-                    <div id="fileUploadSection" class="upload-method-content">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>📄 Upload file đề thi</h3>
-                                <button class="btn btn-sm btn-primary" onclick="App.showExampleFormat()">
-                                    📝 Xem mẫu file
-                                </button>
-                            </div>
-                            <p class="hint-text">Upload file JSON hoặc TXT để tự động tạo đề thi</p>
-                            
-                            <div class="upload-area" id="uploadArea">
-                                <div class="upload-icon">📁</div>
-                                <p class="upload-text">Kéo thả file hoặc click để chọn</p>
-                                <p class="upload-subtext">Hỗ trợ: JSON, TXT (Max 10MB)</p>
-                                <input type="file" id="fileInput" class="file-input" accept=".json,.txt" multiple>
-                            </div>
-                        </div>
-
-                        <!-- My Tests Library -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>📚 Đề thi đã tạo</h3>
-                                <button class="btn btn-sm btn-danger" onclick="App.clearAllTests()" id="clearAllTestsBtn">
-                                    🗑️ Xóa tất cả
-                                </button>
-                            </div>
-                            <div id="testLibrary" class="test-library">
-                                <p class="empty-state">Chưa có đề thi nào</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- AI Generator Method -->
-                    <div id="aiGeneratorSection" class="upload-method-content">
-                        <div class="ai-generator-intro card">
-                            <div class="ai-intro-header">
-                                <div class="ai-robot">🤖</div>
-                                <div class="ai-intro-text">
-                                    <h3>AI Tạo đề thi IELTS</h3>
-                                    <p>Sử dụng trí tuệ nhân tạo để tự động tạo đề thi từ chủ đề hoặc đoạn văn có sẵn</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Generate from Topic -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>💡 Tạo đề từ chủ đề</h3>
-                            </div>
-                            <p class="hint-text">Nhập chủ đề bất kỳ, AI sẽ tự động tạo bài đọc và câu hỏi IELTS</p>
-                            
-                            <div class="ai-form">
-                                <div class="form-group">
-                                    <label>Chủ đề / Topic <span class="required">*</span></label>
-                                    <input type="text" id="aiTopicPrompt" class="input" placeholder="VD: Climate change, Space exploration, Ancient civilizations...">
-                                    <div class="topic-suggestions">
-                                        <span class="suggestion-label">Gợi ý:</span>
-                                        <button type="button" class="topic-chip" onclick="document.getElementById('aiTopicPrompt').value='The impact of social media on modern society'">Social Media</button>
-                                        <button type="button" class="topic-chip" onclick="document.getElementById('aiTopicPrompt').value='Renewable energy and sustainable development'">Renewable Energy</button>
-                                        <button type="button" class="topic-chip" onclick="document.getElementById('aiTopicPrompt').value='The benefits of bilingual education'">Education</button>
-                                        <button type="button" class="topic-chip" onclick="document.getElementById('aiTopicPrompt').value='Urban planning and smart cities'">Urban Planning</button>
-                                        <button type="button" class="topic-chip" onclick="document.getElementById('aiTopicPrompt').value='The psychology of consumer behavior'">Psychology</button>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Band Level</label>
-                                        <select id="aiBandLevel" class="select">
-                                            <option value="5.5">Band 5.5 - Intermediate</option>
-                                            <option value="6.0">Band 6.0</option>
-                                            <option value="6.5" selected>Band 6.5</option>
-                                            <option value="7.0">Band 7.0</option>
-                                            <option value="7.5">Band 7.5 - Advanced</option>
-                                            <option value="8.0">Band 8.0 - Expert</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Số câu hỏi</label>
-                                        <select id="aiQuestionCount" class="select">
-                                            <option value="5">5 câu</option>
-                                            <option value="8">8 câu</option>
-                                            <option value="10" selected>10 câu</option>
-                                            <option value="13">13 câu (1 passage)</option>
-                                            <option value="15">15 câu</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn btn-primary btn-large" id="generateFromPromptBtn">
-                                    ✨ Tạo đề từ chủ đề
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Generate from Text -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>📝 Tạo câu hỏi từ đoạn văn</h3>
-                            </div>
-                            <p class="hint-text">Có sẵn đoạn văn? Paste vào đây, AI sẽ tự động tạo câu hỏi IELTS</p>
-                            
-                            <div class="ai-form">
-                                <div class="form-group">
-                                    <label>Đoạn văn bản <span class="required">*</span></label>
-                                    <textarea id="aiPassageText" class="textarea passage-textarea" placeholder="Dán đoạn văn bản vào đây (ít nhất 100 ký tự)...
-
-VD: Copy từ sách, báo, website về chủ đề academic như khoa học, lịch sử, xã hội..."></textarea>
-                                    <div class="textarea-stats">
-                                        <span id="aiPassageWordCount">0 từ</span>
-                                        <span id="aiPassageCharCount">0 ký tự</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label>Dạng câu hỏi cần tạo</label>
-                                    <div class="question-type-checkboxes">
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="aiQuestionType" value="tfng" checked>
-                                            <span>True/False/Not Given</span>
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="aiQuestionType" value="multiple-choice" checked>
-                                            <span>Multiple Choice</span>
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="aiQuestionType" value="summary" checked>
-                                            <span>Summary Completion</span>
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="aiQuestionType" value="ynng">
-                                            <span>Yes/No/Not Given</span>
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="aiQuestionType" value="sentence">
-                                            <span>Sentence Completion</span>
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="aiQuestionType" value="matching-headings">
-                                            <span>Matching Headings</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn btn-success btn-large" id="generateFromTextBtn">
-                                    🔮 Tạo câu hỏi từ văn bản
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Result Area -->
-                        <div id="aiGeneratorResult" class="ai-generator-result" style="display: none;">
-                            <!-- Results will be shown here -->
-                        </div>
-
-                        <!-- API Key Notice -->
-                        <div class="card ai-notice-card">
-                            <div class="ai-notice">
-                                <span class="notice-icon">💡</span>
-                                <div class="notice-content">
-                                    <strong>Để sử dụng AI Generator:</strong>
-                                    <p>Cấu hình OpenAI API key trong <a href="#" onclick="App.switchTab('settings'); return false;">Settings</a> để có trải nghiệm tốt nhất. Không có API key sẽ sử dụng chế độ demo.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Backup Section -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>💾 Sao lưu dữ liệu</h3>
-                        </div>
-                        <p class="hint-text">Dữ liệu được tự động lưu. Xuất file backup để đảm bảo an toàn.</p>
-                        <div class="backup-actions">
-                            <button class="btn btn-primary" id="exportDataBtn">📥 Xuất dữ liệu</button>
-                            <button class="btn btn-success" id="importDataBtn">📤 Nhập dữ liệu</button>
-                            <input type="file" id="importFile" style="display: none;" accept=".json">
-                        </div>
-                        <p class="backup-info">Lần sao lưu cuối: <strong id="lastBackup">Chưa có</strong></p>
-                    </div>
-                </section>
-
-                <!-- Settings Tab -->
-                <section id="settings" class="tab-content">
-                    <div class="section-header">
-                        <h2>⚙️ Cài đặt</h2>
-                        <p class="section-subtitle">Tùy chỉnh ứng dụng theo sở thích của bạn</p>
-                    </div>
-
-                    <div class="settings-container">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>🎯 Mục tiêu học tập</h3>
-                            </div>
-                            <div class="settings-group">
-                                <div class="setting-item">
-                                    <label>Band hiện tại</label>
-                                    <select id="currentBandSetting" class="select">
-                                        <option value="4.0">Band 4.0</option>
-                                        <option value="4.5">Band 4.5</option>
-                                        <option value="5.0">Band 5.0</option>
-                                        <option value="5.5">Band 5.5</option>
-                                        <option value="6.0">Band 6.0</option>
-                                        <option value="6.5" selected>Band 6.5</option>
-                                        <option value="7.0">Band 7.0</option>
-                                        <option value="7.5">Band 7.5</option>
-                                    </select>
-                                </div>
-                                <div class="setting-item">
-                                    <label>Mục tiêu Band</label>
-                                    <select id="targetBandSetting" class="select">
-                                        <option value="6.0">Band 6.0</option>
-                                        <option value="6.5">Band 6.5</option>
-                                        <option value="7.0">Band 7.0</option>
-                                        <option value="7.5">Band 7.5</option>
-                                        <option value="8.0" selected>Band 8.0</option>
-                                        <option value="8.5">Band 8.5</option>
-                                        <option value="9.0">Band 9.0</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card ai-settings-card">
-                            <div class="card-header">
-                                <h3>🤖 Cài đặt AI Provider</h3>
-                            </div>
-                            <p class="hint-text">Chọn AI provider để tạo đề thi tự động. Hỗ trợ nhiều dịch vụ khác nhau.</p>
-                            
-                            <div class="settings-group">
-                                <div class="setting-item">
-                                    <label>🌐 AI Provider</label>
-                                    <select id="aiProviderSelect" class="select" onchange="AIProvider.onProviderChange(this.value)">
-                                        <option value="openai">🟢 OpenAI (ChatGPT)</option>
-                                        <option value="google">🔵 Google Gemini</option>
-                                        <option value="anthropic">🟠 Anthropic Claude</option>
-                                        <option value="groq">⚡ Groq (Free & Fast)</option>
-                                        <option value="openrouter">🌐 OpenRouter (Multi-Model)</option>
-                                        <option value="custom">🔧 Custom API</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="setting-item">
-                                    <label>📦 Model</label>
-                                    <select id="aiModelSelect" class="select" onchange="AIProvider.onModelChange(this.value)">
-                                        <!-- Models loaded dynamically -->
-                                    </select>
-                                </div>
-
-                                <div class="setting-item">
-                                    <label>🔑 API Key</label>
-                                    <div class="api-key-input-wrapper">
-                                        <input type="password" id="aiApiKeyInput" class="input" 
-                                            placeholder="Nhập API key..."
-                                            onchange="AIProvider.onApiKeyChange(this.value)">
-                                        <button type="button" class="btn btn-sm btn-ghost toggle-visibility" onclick="AIProvider.toggleKeyVisibility()">
-                                            👁️
-                                        </button>
-                                    </div>
-                                    <small id="aiKeyDocsLink">
-                                        <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">
-                                            📄 Lấy API key tại đây
-                                        </a>
-                                    </small>
-                                </div>
-
-                                <div id="customEndpointSection" class="setting-item" style="display: none;">
-                                    <label>🔗 Custom Endpoint</label>
-                                    <input type="text" id="aiCustomEndpoint" class="input" 
-                                        placeholder="https://your-api.com/v1/chat/completions"
-                                        onchange="Storage.set('ai_custom_endpoint', this.value)">
-                                </div>
-
-                                <div id="aiConnectionStatus" class="connection-status">
-                                    <span class="status-dot"></span> Chưa cấu hình
-                                </div>
-
-                                <div class="setting-actions">
-                                    <button class="btn btn-primary btn-sm" onclick="AIProvider.testAndSave()">
-                                        🔌 Test kết nối
-                                    </button>
-                                    <button class="btn btn-ghost btn-sm" onclick="AIProvider.clearSettings()">
-                                        🗑️ Xóa cài đặt
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="provider-info-cards">
-                                <div class="provider-info" data-provider="openai">
-                                    <strong>🟢 OpenAI</strong>
-                                    <p>GPT-4o, GPT-4 Turbo - Chất lượng cao, phí theo usage</p>
-                                </div>
-                                <div class="provider-info" data-provider="google">
-                                    <strong>🔵 Google Gemini</strong>
-                                    <p>Gemini 1.5 Pro/Flash - Có free tier hào phóng</p>
-                                </div>
-                                <div class="provider-info" data-provider="anthropic">
-                                    <strong>🟠 Claude</strong>
-                                    <p>Claude 3.5 Sonnet - Trả lời chính xác, an toàn</p>
-                                </div>
-                                <div class="provider-info" data-provider="groq">
-                                    <strong>⚡ Groq</strong>
-                                    <p>Llama 3.3, Mixtral - MIỄN PHÍ, siêu nhanh!</p>
-                                </div>
-                                <div class="provider-info" data-provider="openrouter">
-                                    <strong>🌐 OpenRouter</strong>
-                                    <p>Truy cập nhiều model qua 1 API key</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3>🔔 Thông báo & Giao diện</h3>
-                            </div>
-                            <div class="settings-group">
-                                <div class="setting-item toggle">
-                                    <label>Âm thanh thông báo</label>
-                                    <label class="switch">
-                                        <input type="checkbox" id="soundSetting" checked>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                                <div class="setting-item toggle">
-                                    <label>Chế độ tối</label>
-                                    <label class="switch">
-                                        <input type="checkbox" id="darkModeSetting">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button class="btn btn-primary btn-large" onclick="Settings.save()">💾 Lưu cài đặt</button>
-                    </div>
-                </section>
+          </section>
+
+          <!-- Library Tab -->
+          <section id="library" class="tab-content">
+            <div class="section-header">
+              <h2>📚 Thư viện đề thi</h2>
+              <p class="section-subtitle">Tất cả đề thi từ các nguồn uy tín</p>
             </div>
-        </main>
+
+            <!-- Source Tabs -->
+            <div class="source-tabs">
+              <button class="source-tab active" data-source="all">
+                Tất cả
+              </button>
+              <button class="source-tab" data-source="cambridge">
+                <span class="source-logo"><i class="ph ph-buildings"></i></span> Cambridge
+              </button>
+              <button class="source-tab" data-source="british-council">
+                <span class="source-logo"><i class="ph ph-globe-hemisphere-east"></i></span> British Council
+              </button>
+              <button class="source-tab" data-source="ielts-official">
+                <span class="source-logo"><i class="ph ph-book-bookmark"></i></span> IELTS Official
+              </button>
+              <button class="source-tab" data-source="custom">
+                <span class="source-logo"><i class="ph ph-magic-wand"></i></span> Đề tự tạo
+              </button>
+            </div>
+
+            <!-- Library Grid -->
+            <div class="library-grid" id="libraryGrid">
+              <!-- Populated dynamically -->
+            </div>
+          </section>
+
+          <!-- Mini-Test Tab -->
+          <section id="minitest" class="tab-content">
+            <div class="section-header">
+              <h2><i class="ph ph-timer"></i> Mini-Test</h2>
+              <p class="section-subtitle">
+                Luyện tập nhanh với 13 câu hỏi trong 15 phút
+              </p>
+            </div>
+
+            <div class="minitest-options">
+              <div class="card">
+                <div class="card-header">
+                  <h3><i class="ph ph-target"></i> Chọn chế độ Mini-Test</h3>
+                </div>
+                <div class="minitest-modes-grid">
+                  <button
+                    class="minitest-mode-card"
+                    onclick="MiniTest.start('random')"
+                  >
+                    <span class="mode-icon"><i class="ph ph-shuffle"></i></span>
+                    <span class="mode-title">Random Mix</span>
+                    <span class="mode-desc"
+                      >13 câu ngẫu nhiên từ nhiều dạng</span
+                    >
+                    <span class="mode-time">15 phút</span>
+                  </button>
+                  <button
+                    class="minitest-mode-card"
+                    onclick="MiniTest.start('tfng')"
+                  >
+                    <span class="mode-icon"><i class="ph ph-check-circle"></i></span>
+                    <span class="mode-title">T/F/NG Focus</span>
+                    <span class="mode-desc"
+                      >Tập trung True/False/Not Given</span
+                    >
+                    <span class="mode-time">15 phút</span>
+                  </button>
+                  <button
+                    class="minitest-mode-card"
+                    onclick="MiniTest.start('matching')"
+                  >
+                    <span class="mode-icon"><i class="ph ph-link"></i></span>
+                    <span class="mode-title">Matching Focus</span>
+                    <span class="mode-desc">Matching Headings/Info</span>
+                    <span class="mode-time">15 phút</span>
+                  </button>
+                  <button
+                    class="minitest-mode-card"
+                    onclick="MiniTest.start('completion')"
+                  >
+                    <span class="mode-icon"><i class="ph ph-pencil-simple"></i></span>
+                    <span class="mode-title">Completion Focus</span>
+                    <span class="mode-desc">Summary/Sentence Completion</span>
+                    <span class="mode-time">15 phút</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Mini-Test History -->
+              <div class="card">
+                <div class="card-header">
+                  <h3><i class="ph ph-chart-bar"></i> Lịch sử Mini-Test</h3>
+                </div>
+                <div class="minitest-history" id="minitestHistory">
+                  <p class="empty-state">Chưa có kết quả Mini-Test nào</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Drill Tab -->
+          <section id="drill" class="tab-content">
+            <div class="section-header">
+              <h2><i class="ph ph-lightning"></i> Drill Mode</h2>
+              <p class="section-subtitle">Luyện tập chuyên sâu từng dạng bài</p>
+            </div>
+
+            <div class="drill-container">
+              <div class="card">
+                <div class="card-header">
+                  <h3><i class="ph ph-target"></i> Chọn dạng bài để drill</h3>
+                </div>
+                <p class="hint-text">
+                  <i class="ph ph-lightbulb"></i> Drill mode sẽ cho bạn làm liên tục nhiều câu cùng dạng để
+                  thành thạo
+                </p>
+
+                <div class="drill-types-grid" id="drillTypesGrid">
+                  <button class="drill-type-card" onclick="Drill.start('tfng')">
+                    <div class="drill-icon"><i class="ph ph-check-circle"></i></div>
+                    <div class="drill-info">
+                      <h4>True/False/Not Given</h4>
+                      <p>Xác định thông tin đúng/sai</p>
+                      <div class="drill-stats">
+                        <span class="accuracy" id="drillAccTfng">--</span>
+                        <span class="total">câu đã làm</span>
+                      </div>
+                    </div>
+                    <div class="difficulty-indicator">
+                      <span class="dot hard"></span>
+                      <span class="label">Khó</span>
+                    </div>
+                  </button>
+
+                  <button class="drill-type-card" onclick="Drill.start('ynng')">
+                    <div class="drill-icon"><i class="ph ph-question"></i></div>
+                    <div class="drill-info">
+                      <h4>Yes/No/Not Given</h4>
+                      <p>Quan điểm của tác giả</p>
+                      <div class="drill-stats">
+                        <span class="accuracy" id="drillAccYnng">--</span>
+                        <span class="total">câu đã làm</span>
+                      </div>
+                    </div>
+                    <div class="difficulty-indicator">
+                      <span class="dot hard"></span>
+                      <span class="label">Khó</span>
+                    </div>
+                  </button>
+
+                  <button
+                    class="drill-type-card"
+                    onclick="Drill.start('matching-headings')"
+                  >
+                    <div class="drill-icon"><i class="ph ph-browsers"></i></div>
+                    <div class="drill-info">
+                      <h4>Matching Headings</h4>
+                      <p>Ghép tiêu đề đoạn văn</p>
+                      <div class="drill-stats">
+                        <span class="accuracy" id="drillAccHeadings">--</span>
+                        <span class="total">câu đã làm</span>
+                      </div>
+                    </div>
+                    <div class="difficulty-indicator">
+                      <span class="dot medium"></span>
+                      <span class="label">Trung bình</span>
+                    </div>
+                  </button>
+
+                  <button
+                    class="drill-type-card"
+                    onclick="Drill.start('multiple-choice')"
+                  >
+                    <div class="drill-icon"><i class="ph ph-list-bullets"></i></div>
+                    <div class="drill-info">
+                      <h4>Multiple Choice</h4>
+                      <p>Câu hỏi trắc nghiệm</p>
+                      <div class="drill-stats">
+                        <span class="accuracy" id="drillAccMc">--</span>
+                        <span class="total">câu đã làm</span>
+                      </div>
+                    </div>
+                    <div class="difficulty-indicator">
+                      <span class="dot easy"></span>
+                      <span class="label">Dễ</span>
+                    </div>
+                  </button>
+
+                  <button
+                    class="drill-type-card"
+                    onclick="Drill.start('summary')"
+                  >
+                    <div class="drill-icon"><i class="ph ph-clipboard-text"></i></div>
+                    <div class="drill-info">
+                      <h4>Summary Completion</h4>
+                      <p>Hoàn thành tóm tắt</p>
+                      <div class="drill-stats">
+                        <span class="accuracy" id="drillAccSummary">--</span>
+                        <span class="total">câu đã làm</span>
+                      </div>
+                    </div>
+                    <div class="difficulty-indicator">
+                      <span class="dot medium"></span>
+                      <span class="label">Trung bình</span>
+                    </div>
+                  </button>
+
+                  <button
+                    class="drill-type-card"
+                    onclick="Drill.start('sentence')"
+                  >
+                    <div class="drill-icon"><i class="ph ph-pencil-simple"></i></div>
+                    <div class="drill-info">
+                      <h4>Sentence Completion</h4>
+                      <p>Hoàn thành câu</p>
+                      <div class="drill-stats">
+                        <span class="accuracy" id="drillAccSentence">--</span>
+                        <span class="total">câu đã làm</span>
+                      </div>
+                    </div>
+                    <div class="difficulty-indicator">
+                      <span class="dot medium"></span>
+                      <span class="label">Trung bình</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Vocabulary Tab -->
+          <section id="vocabulary" class="tab-content">
+            <div class="section-header">
+              <h2><i class="ph ph-book-open"></i> Kho từ vựng</h2>
+              <p class="section-subtitle">Quản lý và ôn tập từ vựng IELTS</p>
+            </div>
+
+            <!-- Learning Modes -->
+            <div class="card">
+              <div class="card-header">
+                <h3>🎯 Chế độ học</h3>
+              </div>
+              <div class="vocab-quick-actions">
+                <button class="vocab-mode-btn" onclick="Flashcard.start('all')">
+                  🎴 Flashcard - Tất cả từ
+                </button>
+                <button class="vocab-mode-btn" onclick="Flashcard.start('new')">
+                  ✨ Flashcard - Từ mới
+                </button>
+                <button
+                  class="vocab-mode-btn"
+                  onclick="Flashcard.start('weak')"
+                >
+                  💪 Flashcard - Từ yếu
+                </button>
+                <button
+                  class="vocab-mode-btn"
+                  onclick="VocabQuiz.start('multiple-choice', 10)"
+                >
+                  📝 Quiz - Trắc nghiệm (10 câu)
+                </button>
+                <button
+                  class="vocab-mode-btn"
+                  onclick="VocabQuiz.start('typing', 10)"
+                >
+                  ✍️ Quiz - Tự luận (10 câu)
+                </button>
+                <button
+                  class="vocab-mode-btn"
+                  onclick="VocabQuiz.start('mixed', 15)"
+                >
+                  🎲 Quiz - Hỗn hợp (15 câu)
+                </button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3>➕ Thêm từ mới</h3>
+              </div>
+              <div class="vocab-add-form">
+                <input
+                  type="text"
+                  id="newWord"
+                  class="input"
+                  placeholder="Từ vựng..."
+                  required
+                />
+                <input
+                  type="text"
+                  id="newMeaning"
+                  class="input"
+                  placeholder="Nghĩa..."
+                  required
+                />
+                <input
+                  type="text"
+                  id="newExample"
+                  class="input"
+                  placeholder="Ví dụ (tùy chọn)..."
+                />
+                <select id="newTopic" class="select">
+                  <option value="general">📝 Tổng quát</option>
+                  <option value="education">🎓 Giáo dục</option>
+                  <option value="environment">🌱 Môi trường</option>
+                  <option value="technology">💻 Công nghệ</option>
+                  <option value="health">🏥 Sức khỏe</option>
+                  <option value="business">💼 Kinh doanh</option>
+                  <option value="culture">🎭 Văn hóa</option>
+                  <option value="science">🔬 Khoa học</option>
+                  <option value="society">👥 Xã hội</option>
+                  <option value="travel">✈️ Du lịch</option>
+                  <option value="sport">⚽ Thể thao</option>
+                  <option value="art">🎨 Nghệ thuật</option>
+                  <option value="media">📺 Truyền thông</option>
+                </select>
+                <button class="btn btn-primary" id="addVocabBtn">
+                  ➕ Thêm
+                </button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3>🔍 Tìm kiếm & Lọc</h3>
+              </div>
+              <div class="vocab-search-bar">
+                <input
+                  type="text"
+                  id="searchVocab"
+                  class="input"
+                  placeholder="🔍 Tìm kiếm từ vựng..."
+                />
+                <select id="topicFilter" class="select">
+                  <option value="all">📚 Tất cả chủ đề</option>
+                  <option value="general">📝 Tổng quát</option>
+                  <option value="education">🎓 Giáo dục</option>
+                  <option value="environment">🌱 Môi trường</option>
+                  <option value="technology">💻 Công nghệ</option>
+                  <option value="health">🏥 Sức khỏe</option>
+                  <option value="business">💼 Kinh doanh</option>
+                  <option value="culture">🎭 Văn hóa</option>
+                  <option value="science">🔬 Khoa học</option>
+                  <option value="society">👥 Xã hội</option>
+                  <option value="travel">✈️ Du lịch</option>
+                  <option value="sport">⚽ Thể thao</option>
+                  <option value="art">🎨 Nghệ thuật</option>
+                  <option value="media">📺 Truyền thông</option>
+                </select>
+                <select id="sortVocab" class="select">
+                  <option value="newest">Mới nhất</option>
+                  <option value="oldest">Cũ nhất</option>
+                  <option value="alphabetical">A-Z</option>
+                </select>
+              </div>
+              <div class="vocab-display-options">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="groupByTopic" />
+                  <span>📂 Nhóm theo chủ đề</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Topic Statistics -->
+            <div class="card">
+              <div class="card-header">
+                <h3>📊 Thống kê theo chủ đề</h3>
+              </div>
+              <div class="topic-stats-container" id="topicStatsContainer">
+                <p class="empty-state">Chưa có thống kê</p>
+              </div>
+            </div>
+
+            <div class="vocab-list-container">
+              <div class="vocab-list" id="vocabList">
+                <p class="empty-state">Chưa có từ vựng nào. Hãy thêm từ mới!</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Errors Tab -->
+          <section id="errors" class="tab-content">
+            <div class="section-header">
+              <h2>❌ Nhật ký lỗi sai</h2>
+              <p class="section-subtitle">Phân tích và học từ các lỗi sai</p>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3>📊 Thống kê lỗi</h3>
+                <button class="btn btn-sm btn-danger" id="clearErrors">
+                  🗑️ Xóa tất cả
+                </button>
+              </div>
+              <div class="error-stats-grid">
+                <div class="error-stat-box">
+                  <span class="error-stat-value" id="totalErrors">0</span>
+                  <span class="error-stat-label">Tổng lỗi</span>
+                </div>
+                <div class="error-stat-box">
+                  <span class="error-stat-value" id="mostCommonError">-</span>
+                  <span class="error-stat-label">Lỗi thường gặp nhất</span>
+                </div>
+                <div class="error-stat-box">
+                  <span class="error-stat-value" id="errorRate">-</span>
+                  <span class="error-stat-label">Tỷ lệ lỗi</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="error-log" id="errorLog">
+              <p class="empty-state">Chưa có lỗi nào được ghi nhận</p>
+            </div>
+          </section>
+
+          <!-- AI Analysis Tab -->
+          <section id="aianalysis" class="tab-content">
+            <div class="section-header">
+              <h2>🤖 AI Phân tích</h2>
+              <p class="section-subtitle">
+                Phân tích thông minh dựa trên lịch sử học tập của bạn
+              </p>
+            </div>
+
+            <div class="ai-analysis-container">
+              <div class="card ai-main-card">
+                <div class="card-header">
+                  <h3>✨ Báo cáo phân tích AI</h3>
+                  <button
+                    class="btn btn-primary"
+                    onclick="AIAnalysis.generate()"
+                    id="generateAIBtn"
+                  >
+                    🔮 Tạo phân tích mới
+                  </button>
+                </div>
+                <div class="ai-analysis-content" id="aiAnalysisContent">
+                  <div class="ai-placeholder">
+                    <div class="ai-icon">🤖</div>
+                    <h3>AI sẵn sàng phân tích</h3>
+                    <p>
+                      Nhấn "Tạo phân tích mới" để AI đánh giá năng lực và đề
+                      xuất lộ trình cải thiện band score.
+                    </p>
+                    <ul class="ai-features">
+                      <li>🎯 Phân tích điểm mạnh/yếu</li>
+                      <li>📊 Đánh giá từng dạng câu hỏi</li>
+                      <li>📈 Đề xuất lộ trình cải thiện</li>
+                      <li>💡 Mẹo làm bài hiệu quả</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3>📊 Thống kê theo dạng bài</h3>
+                </div>
+                <div class="question-type-stats" id="questionTypeStats">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Upload Tab -->
+          <section id="upload" class="tab-content">
+            <div class="section-header">
+              <h2>📤 Tạo đề thi mới</h2>
+              <p class="section-subtitle">
+                Upload file hoặc nhập trực tiếp để tạo đề
+              </p>
+            </div>
+
+            <!-- Tab Switch for Upload Methods -->
+            <div class="upload-method-tabs">
+              <button class="method-tab active" data-method="manual">
+                ✍️ Nhập trực tiếp
+              </button>
+              <button class="method-tab" data-method="upload">
+                📄 Upload file
+              </button>
+              <button class="method-tab" data-method="ai-generator">
+                🤖 AI Tạo đề
+              </button>
+            </div>
+
+            <!-- Manual Entry Method -->
+            <div id="manualEntrySection" class="upload-method-content active">
+              <div class="card">
+                <div class="card-header">
+                  <h3>📝 Thông tin đề thi</h3>
+                </div>
+                <div class="manual-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Tên đề thi <span class="required">*</span></label>
+                      <input
+                        type="text"
+                        id="manualTestTitle"
+                        class="input"
+                        placeholder="VD: Cambridge 18 - Test 1"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Nguồn đề</label>
+                      <select id="manualTestSource" class="select">
+                        <option value="custom">Tự tạo</option>
+                        <option value="cambridge">Cambridge</option>
+                        <option value="british-council">British Council</option>
+                        <option value="ielts-official">IELTS Official</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Band Level</label>
+                      <select id="manualTestLevel" class="select">
+                        <option value="5.0">Band 5.0</option>
+                        <option value="6.0">Band 6.0</option>
+                        <option value="6.5">Band 6.5</option>
+                        <option value="7.0" selected>Band 7.0</option>
+                        <option value="7.5">Band 7.5</option>
+                        <option value="8.0">Band 8.0</option>
+                        <option value="8.5">Band 8.5</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Passage Entry -->
+              <div class="card passage-entry-card">
+                <div class="card-header">
+                  <h3>📖 Passage</h3>
+                  <div class="passage-tabs" id="passageTabs">
+                    <button class="passage-tab active" data-passage="1">
+                      Passage 1
+                    </button>
+                    <button class="passage-tab" data-passage="2">
+                      Passage 2
+                    </button>
+                    <button class="passage-tab" data-passage="3">
+                      Passage 3
+                    </button>
+                  </div>
+                </div>
+
+                <div class="passage-input-container">
+                  <div class="form-group">
+                    <label
+                      >Tiêu đề Passage <span class="required">*</span></label
+                    >
+                    <input
+                      type="text"
+                      id="passageTitle"
+                      class="input"
+                      placeholder="VD: The History of Coffee"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label
+                      >Nội dung Passage <span class="required">*</span></label
+                    >
+                    <textarea
+                      id="passageText"
+                      class="textarea passage-textarea"
+                      placeholder="Dán nội dung passage vào đây... 
+
+Tip: Bạn có thể copy/paste trực tiếp từ PDF hoặc website."
+                    ></textarea>
+                    <div class="textarea-stats">
+                      <span id="passageWordCount">0 từ</span>
+                      <span id="passageCharCount">0 ký tự</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Questions Entry -->
+              <div class="card questions-entry-card">
+                <div class="card-header">
+                  <h3>❓ Câu hỏi</h3>
+                  <button class="btn btn-sm btn-success" id="addQuestionBtn">
+                    ➕ Thêm câu hỏi
+                  </button>
+                </div>
+
+                <div
+                  class="questions-input-container"
+                  id="questionsInputContainer"
+                >
+                  <!-- Question template will be added here -->
+                  <div class="question-entry" data-question-id="1">
+                    <div class="question-header">
+                      <span class="question-number">Câu 1</span>
+                      <select class="select question-type-select">
+                        <option value="tfng">True/False/Not Given</option>
+                        <option value="ynng">Yes/No/Not Given</option>
+                        <option value="multiple-choice">Multiple Choice</option>
+                        <option value="matching-headings">
+                          Matching Headings
+                        </option>
+                        <option value="summary">Summary Completion</option>
+                        <option value="sentence">Sentence Completion</option>
+                      </select>
+                      <button class="btn btn-sm btn-danger remove-question-btn">
+                        🗑️
+                      </button>
+                    </div>
+                    <div class="question-body">
+                      <input
+                        type="text"
+                        class="input question-text-input"
+                        placeholder="Nội dung câu hỏi..."
+                      />
+                      <div class="answer-row">
+                        <input
+                          type="text"
+                          class="input answer-input"
+                          placeholder="Đáp án đúng"
+                        />
+                        <input
+                          type="text"
+                          class="input explanation-input"
+                          placeholder="Giải thích (tùy chọn)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  class="btn btn-primary btn-large save-test-btn"
+                  onclick="ManualEntry.saveTest()"
+                >
+                  💾 Lưu đề thi
+                </button>
+              </div>
+            </div>
+
+            <!-- File Upload Method -->
+            <div id="fileUploadSection" class="upload-method-content">
+              <div class="card">
+                <div class="card-header">
+                  <h3>📄 Upload file đề thi</h3>
+                  <button
+                    class="btn btn-sm btn-primary"
+                    onclick="App.showExampleFormat()"
+                  >
+                    📝 Xem mẫu file
+                  </button>
+                </div>
+                <p class="hint-text">
+                  Upload file JSON hoặc TXT để tự động tạo đề thi
+                </p>
+
+                <div class="upload-area" id="uploadArea">
+                  <div class="upload-icon">📁</div>
+                  <p class="upload-text">Kéo thả file hoặc click để chọn</p>
+                  <p class="upload-subtext">Hỗ trợ: JSON, TXT (Max 10MB)</p>
+                  <input
+                    type="file"
+                    id="fileInput"
+                    class="file-input"
+                    accept=".json,.txt"
+                    multiple
+                  />
+                </div>
+              </div>
+
+              <!-- My Tests Library -->
+              <div class="card">
+                <div class="card-header">
+                  <h3>📚 Đề thi đã tạo</h3>
+                  <button
+                    class="btn btn-sm btn-danger"
+                    onclick="App.clearAllTests()"
+                    id="clearAllTestsBtn"
+                  >
+                    🗑️ Xóa tất cả
+                  </button>
+                </div>
+                <div id="testLibrary" class="test-library">
+                  <p class="empty-state">Chưa có đề thi nào</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Generator Method -->
+            <div id="aiGeneratorSection" class="upload-method-content">
+              <div class="ai-generator-intro card">
+                <div class="ai-intro-header">
+                  <div class="ai-robot">🤖</div>
+                  <div class="ai-intro-text">
+                    <h3>AI Tạo đề thi IELTS</h3>
+                    <p>
+                      Sử dụng trí tuệ nhân tạo để tự động tạo đề thi từ chủ đề
+                      hoặc đoạn văn có sẵn
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Generate from Topic -->
+              <div class="card">
+                <div class="card-header">
+                  <h3>💡 Tạo đề từ chủ đề</h3>
+                </div>
+                <p class="hint-text">
+                  Nhập chủ đề bất kỳ, AI sẽ tự động tạo bài đọc và câu hỏi IELTS
+                </p>
+
+                <div class="ai-form">
+                  <div class="form-group">
+                    <label
+                      >Chủ đề / Topic <span class="required">*</span></label
+                    >
+                    <input
+                      type="text"
+                      id="aiTopicPrompt"
+                      class="input"
+                      placeholder="VD: Climate change, Space exploration, Ancient civilizations..."
+                    />
+                    <div class="topic-suggestions">
+                      <span class="suggestion-label">Gợi ý:</span>
+                      <button
+                        type="button"
+                        class="topic-chip"
+                        onclick="
+                          document.getElementById('aiTopicPrompt').value =
+                            'The impact of social media on modern society'
+                        "
+                      >
+                        Social Media
+                      </button>
+                      <button
+                        type="button"
+                        class="topic-chip"
+                        onclick="
+                          document.getElementById('aiTopicPrompt').value =
+                            'Renewable energy and sustainable development'
+                        "
+                      >
+                        Renewable Energy
+                      </button>
+                      <button
+                        type="button"
+                        class="topic-chip"
+                        onclick="
+                          document.getElementById('aiTopicPrompt').value =
+                            'The benefits of bilingual education'
+                        "
+                      >
+                        Education
+                      </button>
+                      <button
+                        type="button"
+                        class="topic-chip"
+                        onclick="
+                          document.getElementById('aiTopicPrompt').value =
+                            'Urban planning and smart cities'
+                        "
+                      >
+                        Urban Planning
+                      </button>
+                      <button
+                        type="button"
+                        class="topic-chip"
+                        onclick="
+                          document.getElementById('aiTopicPrompt').value =
+                            'The psychology of consumer behavior'
+                        "
+                      >
+                        Psychology
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label>Band Level</label>
+                      <select id="aiBandLevel" class="select">
+                        <option value="5.5">Band 5.5 - Intermediate</option>
+                        <option value="6.0">Band 6.0</option>
+                        <option value="6.5" selected>Band 6.5</option>
+                        <option value="7.0">Band 7.0</option>
+                        <option value="7.5">Band 7.5 - Advanced</option>
+                        <option value="8.0">Band 8.0 - Expert</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Số câu hỏi</label>
+                      <select id="aiQuestionCount" class="select">
+                        <option value="5">5 câu</option>
+                        <option value="8">8 câu</option>
+                        <option value="10" selected>10 câu</option>
+                        <option value="13">13 câu (1 passage)</option>
+                        <option value="15">15 câu</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button
+                    class="btn btn-primary btn-large"
+                    id="generateFromPromptBtn"
+                  >
+                    ✨ Tạo đề từ chủ đề
+                  </button>
+                </div>
+              </div>
+
+              <!-- Generate from Text -->
+              <div class="card">
+                <div class="card-header">
+                  <h3>📝 Tạo câu hỏi từ đoạn văn</h3>
+                </div>
+                <p class="hint-text">
+                  Có sẵn đoạn văn? Paste vào đây, AI sẽ tự động tạo câu hỏi
+                  IELTS
+                </p>
+
+                <div class="ai-form">
+                  <div class="form-group">
+                    <label>Đoạn văn bản <span class="required">*</span></label>
+                    <textarea
+                      id="aiPassageText"
+                      class="textarea passage-textarea"
+                      placeholder="Dán đoạn văn bản vào đây (ít nhất 100 ký tự)...
+
+VD: Copy từ sách, báo, website về chủ đề academic như khoa học, lịch sử, xã hội..."
+                    ></textarea>
+                    <div class="textarea-stats">
+                      <span id="aiPassageWordCount">0 từ</span>
+                      <span id="aiPassageCharCount">0 ký tự</span>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Dạng câu hỏi cần tạo</label>
+                    <div class="question-type-checkboxes">
+                      <label class="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="aiQuestionType"
+                          value="tfng"
+                          checked
+                        />
+                        <span>True/False/Not Given</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="aiQuestionType"
+                          value="multiple-choice"
+                          checked
+                        />
+                        <span>Multiple Choice</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="aiQuestionType"
+                          value="summary"
+                          checked
+                        />
+                        <span>Summary Completion</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="aiQuestionType"
+                          value="ynng"
+                        />
+                        <span>Yes/No/Not Given</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="aiQuestionType"
+                          value="sentence"
+                        />
+                        <span>Sentence Completion</span>
+                      </label>
+                      <label class="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="aiQuestionType"
+                          value="matching-headings"
+                        />
+                        <span>Matching Headings</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <button
+                    class="btn btn-success btn-large"
+                    id="generateFromTextBtn"
+                  >
+                    🔮 Tạo câu hỏi từ văn bản
+                  </button>
+                </div>
+              </div>
+
+              <!-- Result Area -->
+              <div
+                id="aiGeneratorResult"
+                class="ai-generator-result"
+                style="display: none"
+              >
+                <!-- Results will be shown here -->
+              </div>
+
+              <!-- API Key Notice -->
+              <div class="card ai-notice-card">
+                <div class="ai-notice">
+                  <span class="notice-icon">💡</span>
+                  <div class="notice-content">
+                    <strong>Để sử dụng AI Generator:</strong>
+                    <p>
+                      Cấu hình OpenAI API key trong
+                      <a
+                        href="#"
+                        onclick="
+                          App.switchTab('settings');
+                          return false;
+                        "
+                        >Settings</a
+                      >
+                      để có trải nghiệm tốt nhất. Không có API key sẽ sử dụng
+                      chế độ demo.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Backup Section -->
+            <div class="card">
+              <div class="card-header">
+                <h3>💾 Sao lưu dữ liệu</h3>
+              </div>
+              <p class="hint-text">
+                Dữ liệu được tự động lưu. Xuất file backup để đảm bảo an toàn.
+              </p>
+              <div class="backup-actions">
+                <button class="btn btn-primary" id="exportDataBtn">
+                  📥 Xuất dữ liệu
+                </button>
+                <button class="btn btn-success" id="importDataBtn">
+                  📤 Nhập dữ liệu
+                </button>
+                <input
+                  type="file"
+                  id="importFile"
+                  style="display: none"
+                  accept=".json"
+                />
+              </div>
+              <p class="backup-info">
+                Lần sao lưu cuối: <strong id="lastBackup">Chưa có</strong>
+              </p>
+            </div>
+          </section>
+
+          <!-- Settings Tab -->
+          <section id="settings" class="tab-content">
+            <div class="section-header">
+              <h2>⚙️ Cài đặt</h2>
+              <p class="section-subtitle">
+                Tùy chỉnh ứng dụng theo sở thích của bạn
+              </p>
+            </div>
+
+            <div class="settings-container">
+              <div class="card">
+                <div class="card-header">
+                  <h3>🎯 Mục tiêu học tập</h3>
+                </div>
+                <div class="settings-group">
+                  <div class="setting-item">
+                    <label>Band hiện tại</label>
+                    <select id="currentBandSetting" class="select">
+                      <option value="4.0">Band 4.0</option>
+                      <option value="4.5">Band 4.5</option>
+                      <option value="5.0">Band 5.0</option>
+                      <option value="5.5">Band 5.5</option>
+                      <option value="6.0">Band 6.0</option>
+                      <option value="6.5" selected>Band 6.5</option>
+                      <option value="7.0">Band 7.0</option>
+                      <option value="7.5">Band 7.5</option>
+                    </select>
+                  </div>
+                  <div class="setting-item">
+                    <label>Mục tiêu Band</label>
+                    <select id="targetBandSetting" class="select">
+                      <option value="6.0">Band 6.0</option>
+                      <option value="6.5">Band 6.5</option>
+                      <option value="7.0">Band 7.0</option>
+                      <option value="7.5">Band 7.5</option>
+                      <option value="8.0" selected>Band 8.0</option>
+                      <option value="8.5">Band 8.5</option>
+                      <option value="9.0">Band 9.0</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card ai-settings-card">
+                <div class="card-header">
+                  <h3>🤖 Cài đặt AI Provider</h3>
+                </div>
+                <p class="hint-text">
+                  Chọn AI provider để tạo đề thi tự động. Hỗ trợ nhiều dịch vụ
+                  khác nhau.
+                </p>
+
+                <div class="settings-group">
+                  <div class="setting-item">
+                    <label>🌐 AI Provider</label>
+                    <select
+                      id="aiProviderSelect"
+                      class="select"
+                      onchange="AIProvider.onProviderChange(this.value)"
+                    >
+                      <option value="openai">🟢 OpenAI (ChatGPT)</option>
+                      <option value="google">🔵 Google Gemini</option>
+                      <option value="anthropic">🟠 Anthropic Claude</option>
+                      <option value="groq">⚡ Groq (Free & Fast)</option>
+                      <option value="openrouter">
+                        🌐 OpenRouter (Multi-Model)
+                      </option>
+                      <option value="custom">🔧 Custom API</option>
+                    </select>
+                  </div>
+
+                  <div class="setting-item">
+                    <label>📦 Model</label>
+                    <select
+                      id="aiModelSelect"
+                      class="select"
+                      onchange="AIProvider.onModelChange(this.value)"
+                    >
+                      <!-- Models loaded dynamically -->
+                    </select>
+                  </div>
+
+                  <div class="setting-item">
+                    <label>🔑 API Key</label>
+                    <div class="api-key-input-wrapper">
+                      <input
+                        type="password"
+                        id="aiApiKeyInput"
+                        class="input"
+                        placeholder="Nhập API key..."
+                        onchange="AIProvider.onApiKeyChange(this.value)"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-ghost toggle-visibility"
+                        onclick="AIProvider.toggleKeyVisibility()"
+                      >
+                        👁️
+                      </button>
+                    </div>
+                    <small id="aiKeyDocsLink">
+                      <a
+                        href="https://platform.openai.com/api-keys"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        📄 Lấy API key tại đây
+                      </a>
+                    </small>
+                  </div>
+
+                  <div
+                    id="customEndpointSection"
+                    class="setting-item"
+                    style="display: none"
+                  >
+                    <label>🔗 Custom Endpoint</label>
+                    <input
+                      type="text"
+                      id="aiCustomEndpoint"
+                      class="input"
+                      placeholder="https://your-api.com/v1/chat/completions"
+                      onchange="Storage.set('ai_custom_endpoint', this.value)"
+                    />
+                  </div>
+
+                  <div id="aiConnectionStatus" class="connection-status">
+                    <span class="status-dot"></span> Chưa cấu hình
+                  </div>
+
+                  <div class="setting-actions">
+                    <button
+                      class="btn btn-primary btn-sm"
+                      onclick="AIProvider.testAndSave()"
+                    >
+                      🔌 Test kết nối
+                    </button>
+                    <button
+                      class="btn btn-ghost btn-sm"
+                      onclick="AIProvider.clearSettings()"
+                    >
+                      🗑️ Xóa cài đặt
+                    </button>
+                  </div>
+                </div>
+
+                <div class="provider-info-cards">
+                  <div class="provider-info" data-provider="openai">
+                    <strong>🟢 OpenAI</strong>
+                    <p>GPT-4o, GPT-4 Turbo - Chất lượng cao, phí theo usage</p>
+                  </div>
+                  <div class="provider-info" data-provider="google">
+                    <strong>🔵 Google Gemini</strong>
+                    <p>Gemini 1.5 Pro/Flash - Có free tier hào phóng</p>
+                  </div>
+                  <div class="provider-info" data-provider="anthropic">
+                    <strong>🟠 Claude</strong>
+                    <p>Claude 3.5 Sonnet - Trả lời chính xác, an toàn</p>
+                  </div>
+                  <div class="provider-info" data-provider="groq">
+                    <strong>⚡ Groq</strong>
+                    <p>Llama 3.3, Mixtral - MIỄN PHÍ, siêu nhanh!</p>
+                  </div>
+                  <div class="provider-info" data-provider="openrouter">
+                    <strong>🌐 OpenRouter</strong>
+                    <p>Truy cập nhiều model qua 1 API key</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3>🔔 Thông báo & Giao diện</h3>
+                </div>
+                <div class="settings-group">
+                  <div class="setting-item toggle">
+                    <label>Âm thanh thông báo</label>
+                    <label class="switch">
+                      <input type="checkbox" id="soundSetting" checked />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <div class="setting-item toggle">
+                    <label>Chế độ tối</label>
+                    <label class="switch">
+                      <input type="checkbox" id="darkModeSetting" />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                class="btn btn-primary btn-large"
+                onclick="Settings.save()"
+              >
+                💾 Lưu cài đặt
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
 
     <!-- Fullscreen Practice Mode Overlay -->
-    <div id="fullscreenMode" class="fullscreen-mode" style="display: none;">
-        <div class="fullscreen-header">
-            <div class="fs-left">
-                <button class="btn btn-danger btn-sm" onclick="Practice.exitFullscreen()">✕ Thoát</button>
-                <span class="fs-test-title" id="fsTestTitle">-</span>
-            </div>
-            <div class="fs-center">
-                <div class="fs-timer" id="fsTimer">60:00</div>
-            </div>
-            <div class="fs-right">
-                <span class="fs-progress" id="fsProgress">0/40</span>
-                <button class="btn btn-primary" id="fsSubmitBtn">📤 Nộp bài</button>
-            </div>
+    <div id="fullscreenMode" class="fullscreen-mode" style="display: none">
+      <div class="fullscreen-header">
+        <div class="fs-left">
+          <button
+            class="btn btn-danger btn-sm"
+            onclick="Practice.exitFullscreen()"
+          >
+            ✕ Thoát
+          </button>
+          <span class="fs-test-title" id="fsTestTitle">-</span>
         </div>
-        
-        <div class="fullscreen-content">
-            <div class="fs-passage-panel" id="fsPassagePanel">
-                <div class="fs-passage-header">
-                    <h2 id="fsPassageTitle">Passage 1</h2>
-                    <div class="fs-highlight-controls">
-                        <button class="highlight-btn active" data-color="yellow">🟨</button>
-                        <button class="highlight-btn" data-color="green">🟩</button>
-                        <button class="highlight-btn" data-color="blue">🟦</button>
-                        <button class="highlight-btn" data-color="pink">🟪</button>
-                        <button class="btn btn-sm" id="fsClearHighlights">🗑️</button>
-                    </div>
-                </div>
-                <div class="fs-passage-content" id="fsPassageContent">
-                    <!-- Passage content here -->
-                </div>
-            </div>
-            
-            <div class="fs-questions-panel" id="fsQuestionsPanel">
-                <div class="fs-questions-header">
-                    <h3>Questions</h3>
-                    <div class="fs-question-nav" id="fsQuestionNav">
-                        <!-- Question navigation buttons -->
-                    </div>
-                </div>
-                <div class="fs-questions-content" id="fsQuestionsContent">
-                    <!-- Questions here -->
-                </div>
-            </div>
+        <div class="fs-center">
+          <div class="fs-timer" id="fsTimer">60:00</div>
         </div>
+        <div class="fs-right">
+          <span class="fs-progress" id="fsProgress">0/40</span>
+          <button class="btn btn-primary" id="fsSubmitBtn">📤 Nộp bài</button>
+        </div>
+      </div>
+
+      <div class="fullscreen-content">
+        <div class="fs-passage-panel" id="fsPassagePanel">
+          <div class="fs-passage-header">
+            <h2 id="fsPassageTitle">Passage 1</h2>
+            <div class="fs-highlight-controls">
+              <button class="highlight-btn active" data-color="yellow">
+                🟨
+              </button>
+              <button class="highlight-btn" data-color="green">🟩</button>
+              <button class="highlight-btn" data-color="blue">🟦</button>
+              <button class="highlight-btn" data-color="pink">🟪</button>
+              <button class="btn btn-sm" id="fsClearHighlights">🗑️</button>
+            </div>
+          </div>
+          <div class="fs-passage-content" id="fsPassageContent">
+            <!-- Passage content here -->
+          </div>
+        </div>
+
+        <div class="fs-questions-panel" id="fsQuestionsPanel">
+          <div class="fs-questions-header">
+            <h3>Questions</h3>
+            <div class="fs-question-nav" id="fsQuestionNav">
+              <!-- Question navigation buttons -->
+            </div>
+          </div>
+          <div class="fs-questions-content" id="fsQuestionsContent">
+            <!-- Questions here -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Notification Container -->
     <div id="notificationContainer"></div>
 
     <!-- JavaScript Files -->
-    <script src="js/config.js"></script>
-    <script src="js/notification.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/timer.js"></script>
-    <script src="js/file_parser.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/practice.js"></script>
-    <script src="js/vocabulary.js"></script>
-    <script src="js/flashcard.js"></script>
-    <script src="js/vocab-quiz.js"></script>
-    <script src="js/text-selector.js"></script>
-    <script src="js/error-tracker.js"></script>
-    <script src="js/minitest.js"></script>
-    <script src="js/drill.js"></script>
-    <script src="js/ai-provider.js"></script>
-    <script src="js/ai-analysis.js"></script>
-    <script src="js/ai-generator.js"></script>
-    <script src="js/manual-entry.js"></script>
-    <script src="js/library.js"></script>
-    <script src="js/app.js"></script>
-</body>
+    <!-- Main Application Module -->
+    <script type="module" src="js/main.js"></script>
+  </body>
 </html>

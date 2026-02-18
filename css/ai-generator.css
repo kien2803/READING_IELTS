@@ -11,14 +11,14 @@
 
 /* ===== HEADER ===== */
 .ai-gen-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-xl);
     padding: var(--spacing-2xl);
     margin-bottom: var(--spacing-2xl);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: var(--shadow-lg);
 }
 
 .header-content {
@@ -41,7 +41,7 @@
     margin: 0;
     font-size: var(--font-size-3xl);
     font-weight: 800;
-    color: white;
+    color: var(--text-primary);
 }
 
 .header-subtitle {
@@ -51,13 +51,13 @@
 }
 
 .premium-badge {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
+    background: rgba(59, 130, 246, 0.1);
     padding: var(--spacing-sm) var(--spacing-lg);
     border-radius: var(--radius-full);
     font-weight: 600;
-    color: white;
+    color: var(--primary-color);
     font-size: var(--font-size-sm);
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 /* ===== CONFIG SECTION ===== */
@@ -217,10 +217,9 @@
 }
 
 .band-btn.active {
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     border-color: var(--primary-color);
     color: white;
-    box-shadow: var(--shadow-glow);
 }
 
 .band-description {
@@ -274,16 +273,16 @@
     border-radius: var(--radius-full);
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .modern-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 20px;
     height: 20px;
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: var(--shadow-md);
 }
 
 .modern-slider::-moz-range-thumb {
@@ -311,7 +310,7 @@
 }
 
 .generate-btn {
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     color: white;
     font-size: var(--font-size-lg);
     font-weight: 700;
@@ -319,7 +318,6 @@
     border: none;
     border-radius: var(--radius-full);
     cursor: pointer;
-    box-shadow: var(--shadow-lg);
     transition: all var(--transition-base);
     display: inline-flex;
     align-items: center;

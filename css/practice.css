@@ -41,17 +41,17 @@
     padding: 4px 10px;
     font-size: var(--font-size-xs);
     font-weight: 600;
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     color: #fff;
     border-radius: var(--radius-full);
 }
 
 .test-selector-card .test-badge.sample {
-    background: var(--gradient-success);
+    background: var(--success-color);
 }
 
 .test-selector-card .test-badge.cambridge {
-    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    background: #8b5cf6; /* Solid purple */
 }
 
 .test-selector-title {
@@ -422,7 +422,7 @@
     justify-content: center;
     width: 28px;
     height: 28px;
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     color: #fff;
     font-size: var(--font-size-sm);
     font-weight: 700;
@@ -582,7 +582,7 @@
 
 /* Active Mini-test */
 .minitest-active {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    background: rgba(59, 130, 246, 0.05);
 }
 
 .minitest-header {
@@ -651,7 +651,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-primary);
+    background: var(--primary-color);
     color: #fff;
     font-weight: 700;
     border-radius: var(--radius-sm);
@@ -788,7 +788,7 @@
 
 /* Active Drill */
 .drill-active {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(245, 158, 11, 0.05));
+    background: rgba(239, 68, 68, 0.05);
 }
 
 .drill-header {
