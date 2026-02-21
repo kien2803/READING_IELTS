@@ -211,7 +211,7 @@ These coffee houses quickly became centers of social activity and communication 
         document.querySelectorAll('.question-type-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const type = card.dataset.type;
-                this.selectQuestionType(type);
+                this.selectQuestionType(e, type);
             });
         });
 
@@ -442,7 +442,7 @@ These coffee houses quickly became centers of social activity and communication 
     /**
      * Select question type - improved
      */
-    selectQuestionType(type) {
+    selectQuestionType(e, type) {
         if (!this.selectedTestId || !this.selectedTestData) {
             Utils.showNotification('⚠️ Vui lòng chọn đề thi trước!', 'warning');
             
@@ -461,7 +461,7 @@ These coffee houses quickly became centers of social activity and communication 
             card.classList.remove('selected');
         });
         
-        const target = event ? event.target.closest('.question-type-card') : null;
+        const target = e ? e.target.closest('.question-type-card') : null;
         if (target) {
             target.classList.add('selected');
         }
@@ -1188,7 +1188,7 @@ Keep it concise, practical, and encouraging.`;
         });
 
         grid.innerHTML = typeCards.map(t => `
-            <div class="question-type-card" data-type="${t.type}" onclick="Practice.selectQuestionType('${t.type}')">
+            <div class="question-type-card" data-type="${t.type}" onclick="Practice.selectQuestionType(event, '${t.type}')">
                 <span class="type-icon">${t.icon}</span>
                 <span class="type-name">${t.name}</span>
                 <span class="type-desc">${t.desc}</span>

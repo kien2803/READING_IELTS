@@ -158,7 +158,7 @@ const AIGenerator = {
                                     <button 
                                         class="band-btn" 
                                         data-band="${band}"
-                                        onclick="AIGenerator.selectBand(${band})"
+                                        onclick="AIGenerator.selectBand(event, ${band})"
                                     >
                                         ${band.toFixed(1)}
                                     </button>
@@ -347,11 +347,13 @@ const AIGenerator = {
     /**
      * Select band
      */
-    selectBand(band) {
+    selectBand(e, band) {
         document.querySelectorAll('.band-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        event.target.classList.add('active');
+        if (e && e.target) {
+            e.target.classList.add('active');
+        }
         
         const descriptions = {
             4.0: 'Basic - Simple passages with straightforward questions',
