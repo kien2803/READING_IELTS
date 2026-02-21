@@ -23,6 +23,9 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+    <!-- DOMPurify for XSS Protection -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+
     <!-- CSS Files -->
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/sidebar.css" />
@@ -173,10 +176,6 @@
               class="btn btn-primary btn-quick-practice"
               onclick="App.startQuickPractice()"
             >
-            <button
-              class="btn btn-primary btn-quick-practice"
-              onclick="App.startQuickPractice()"
-            >
               <i class="ph ph-lightning"></i> Luyện tập nhanh
             </button>
           </div>
@@ -289,22 +288,19 @@
 
               <!-- Charts Section -->
               <div class="charts-section">
-                  <div class="section-header">
-                  <div class="section-header">
-                      <h2><i class="ph ph-chart-pie-slice"></i> Biểu đồ phân tích</h2>
-                      <button class="btn btn-sm btn-ghost" onclick="DashboardCharts.refresh()"><i class="ph ph-arrow-clockwise"></i> Làm mới</button>
-                  </div>
+                <div class="section-header">
+                  <h2><i class="ph ph-chart-pie-slice"></i> Biểu đồ phân tích</h2>
+                  <button class="btn btn-sm btn-ghost" onclick="DashboardCharts.refresh()"><i class="ph ph-arrow-clockwise"></i> Làm mới</button>
+                </div>
                   
                   <div class="charts-grid">
                       <!-- Line Chart - Progress Over Time -->
-                      <div class="chart-container">
                       <div class="chart-container">
                           <h3><i class="ph ph-trend-up"></i> Tiến độ theo thời gian</h3>
                           <canvas id="lineChart"></canvas>
                       </div>
 
                       <!-- Radar Chart - Skills Analysis -->
-                      <div class="chart-container">
                       <div class="chart-container">
                           <h3><i class="ph ph-target"></i> Phân tích kỹ năng</h3>
                           <canvas id="radarChart"></canvas>
@@ -314,20 +310,17 @@
                   <div class="charts-grid">
                       <!-- Bar Chart - Band Distribution -->
                       <div class="chart-container">
-                      <div class="chart-container">
                           <h3><i class="ph ph-chart-bar"></i> Phân bố Band Score</h3>
                           <canvas id="barChart"></canvas>
                       </div>
 
                       <!-- Pie Chart - Question Type Accuracy -->
                       <div class="chart-container">
-                      <div class="chart-container">
                           <h3><i class="ph ph-check-circle"></i> Độ chính xác theo dạng câu hỏi</h3>
                           <canvas id="pieChart"></canvas>
                       </div>
                   </div>
 
-                  <!-- Performance Table -->
                   <!-- Performance Table -->
                   <div class="chart-container full-width">
                       <h3><i class="ph ph-table"></i> Kết quả gần đây</h3>
@@ -401,10 +394,6 @@
                     <option value="ielts-official">IELTS Official</option>
                     <option value="custom">Đề tự tạo</option>
                   </select>
-                  <button
-                    class="btn btn-primary btn-sm"
-                    onclick="App.switchTab('upload')"
-                  >
                   <button
                     class="btn btn-primary btn-sm"
                     onclick="App.switchTab('upload')"
@@ -484,15 +473,9 @@
                   id="startPracticeBtn"
                   onclick="Practice.startSelectedTest()"
                 >
-                  id="startPracticeBtn"
-                  onclick="Practice.startSelectedTest()"
-                >
                   <i class="ph ph-rocket-launch"></i> Bắt đầu luyện tập
                 </button>
                 <button
-                  class="btn btn-success btn-large btn-start"
-                  onclick="Practice.startFullscreen()"
-                >
                   class="btn btn-success btn-large btn-start"
                   onclick="Practice.startFullscreen()"
                 >
@@ -525,14 +508,12 @@
                         data-color="yellow"
                         title="Yellow"
                       >
-                      >
                         <div style="width: 12px; height: 12px; background: #ffff00;border-radius:2px;"></div>
                       </button>
                       <button
                         class="btn btn-sm highlight-btn"
                         data-color="green"
                         title="Green"
-                      >
                       >
                         <div style="width: 12px; height: 12px; background: #00ff00;border-radius:2px;"></div>
                       </button>
@@ -541,14 +522,11 @@
                         data-color="blue"
                         title="Blue"
                       >
-                      >
                         <div style="width: 12px; height: 12px; background: #0000ff;border-radius:2px;"></div>
                       </button>
                       <button
                         class="btn btn-sm highlight-btn"
                         data-color="pink"
-                        title="Pink"
-                      >
                         title="Pink"
                       >
                         <div style="width: 12px; height: 12px; background: #FFC0CB;border-radius:2px;"></div>
@@ -580,7 +558,6 @@
                     <!-- Questions loaded dynamically -->
                   </div>
                   <button class="btn btn-primary btn-large" id="submitAnswers">
-                    <button class="btn btn-primary btn-large" id="submitAnswers">
                     <i class="ph ph-paper-plane-right"></i> Nộp bài
                   </button>
                 </div>

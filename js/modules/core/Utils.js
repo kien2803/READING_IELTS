@@ -380,6 +380,21 @@ const Utils = {
     },
 
     /**
+     * Sanitize HTML content
+     * @param {string} html - HTML string to sanitize
+     * @returns {string} Sanitized HTML
+     */
+    sanitize(html) {
+        if (window.DOMPurify) {
+            return DOMPurify.sanitize(html);
+        }
+        // Fallback simple escape for safety if DOMPurify fails to load
+        const div = document.createElement('div');
+        div.textContent = html;
+        return div.innerHTML;
+    },
+
+    /**
      * Export data as JSON file
      * @param {Object} data - Data to export
      * @param {string} filename - Name of file

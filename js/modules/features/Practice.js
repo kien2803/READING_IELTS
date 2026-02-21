@@ -203,7 +203,7 @@ These coffee houses quickly became centers of social activity and communication 
         // Level selector
         document.querySelectorAll('.level-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                this.selectLevel(e.target.dataset.level);
+                this.selectLevel(e, e.target.dataset.level);
             });
         });
 
@@ -338,8 +338,15 @@ These coffee houses quickly became centers of social activity and communication 
             span.dataset.highlightId = Utils.generateId();
             span.title = 'Double-click to remove';
             
-            // Wrap selection
-            range.surroundContents(span);
+            // Wrap selection - More robust method than surroundContents
+            try {
+                range.surroundContents(span);
+            } catch (e) {
+                // If surroundContents fails (complex selection), use extractContents
+                const contents = range.extractContents();
+                span.appendChild(contents);
+                range.insertNode(span);
+            }
             
             // Save highlight
             this.highlights.push({
@@ -361,8 +368,8 @@ These coffee houses quickly became centers of social activity and communication 
             span.style.animation = 'highlightPulse 0.5s ease-out';
 
         } catch (error) {
-            console.log('Cannot highlight this selection:', error.message);
-            Utils.showNotification('Không thể highlight vùng này. Hãy chọn text đơn giản hơn.', 'warning', 2000);
+            console.warn('Highlight Error:', error);
+            Utils.showNotification('Không thể highlight vùng này. Hãy chọn đoạn văn đơn giản hơn.', 'warning', 2000);
         }
     },
 
@@ -417,13 +424,17 @@ These coffee houses quickly became centers of social activity and communication 
     /**
      * Select level
      */
-    selectLevel(level) {
+    selectLevel(e, level) {
         this.currentLevel = level;
         
         document.querySelectorAll('.level-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        event.target.classList.add('active');
+        
+        const target = e ? e.target : null;
+        if (target) {
+            target.classList.add('active');
+        }
 
         Utils.showNotification(`Đã chọn level ${level}`, 'info', 1500);
     },
@@ -449,7 +460,11 @@ These coffee houses quickly became centers of social activity and communication 
         document.querySelectorAll('.question-type-card').forEach(card => {
             card.classList.remove('selected');
         });
-        event.target.closest('.question-type-card').classList.add('selected');
+        
+        const target = event ? event.target.closest('.question-type-card') : null;
+        if (target) {
+            target.classList.add('selected');
+        }
 
         // Start test based on type
         if (type === 'full-test') {
@@ -583,10 +598,12 @@ These coffee houses quickly became centers of social activity and communication 
 
         const paragraphs = this.currentPassage.text.split('\n\n').filter(p => p.trim());
         
-        passageContent.innerHTML = `
+        const html = `
             <h4 style="color: #667eea; margin-bottom: 15px;">${this.currentPassage.title}</h4>
             ${paragraphs.map(p => `<p>${p.trim()}</p>`).join('')}
         `;
+        
+        passageContent.innerHTML = Utils.sanitize(html);
 
         // Re-enable highlight mode if it was active
         if (this.isHighlightMode) {
@@ -614,7 +631,7 @@ These coffee houses quickly became centers of social activity and communication 
             return this.renderSingleQuestion(q, index);
         }).join('');
         
-        questionsContent.innerHTML = questionsHTML;
+        questionsContent.innerHTML = Utils.sanitize(questionsHTML);
 
         // Bind answer events
         this.bindAnswerEvents();
@@ -901,7 +918,7 @@ These coffee houses quickly became centers of social activity and communication 
                 ${!isCorrect ? `<div><strong>Bạn trả lời:</strong> ${userAnswer || '(Không trả lời)'}</div>` : ''}
                 <div><strong>Giải thích:</strong> ${q.explanation || 'Xem lại bài đọc để tìm thông tin.'}</div>
                 ${!isCorrect ? `
-                    <button class="btn btn-sm btn-primary" style="margin-top: 10px;" onclick="Practice.getAIExplanation('${q.id}', ${index})">
+                    <button class="btn btn-sm btn-primary" style="margin-top: 10px;" onclick="Practice.getAIExplanation(event, '${q.id}', ${index})">
                         🤖 AI giải thích chi tiết
                     </button>
                     <div id="ai-explanation-${index}" style="display: none;"></div>
@@ -916,12 +933,12 @@ These coffee houses quickly became centers of social activity and communication 
     /**
      * Get AI explanation for specific question - Using OpenAI
      */
-    async getAIExplanation(questionId, questionIndex) {
+    async getAIExplanation(e, questionId, questionIndex) {
         const question = this.currentQuestions.find(q => q.id === questionId);
         if (!question) return;
 
         const container = document.getElementById(`ai-explanation-${questionIndex}`);
-        const btn = event.target;
+        const btn = e ? e.target : (typeof event !== 'undefined' ? event.target : null);
         
         if (!container) return;
 
@@ -1085,7 +1102,7 @@ Keep it concise, practical, and encouraging.`;
     },
 
     /**
-     * Start fullscreen mode - CRITICAL MISSING FUNCTION
+     * Start fullscreen mode
      */
     startFullscreen() {
         if (!this.selectedTestData) {
@@ -1114,6 +1131,27 @@ Keep it concise, practical, and encouraging.`;
                 this.startSelectedTest();
             }
         }
+    },
+
+    /**
+     * Exit fullscreen mode
+     */
+    exitFullscreen() {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+        
+        // Handle custom fullscreen UI if exists
+        const fsUI = document.getElementById('fullscreenMode');
+        if (fsUI) {
+            fsUI.style.display = 'none';
+        }
+
+        Utils.showNotification('Đã thoát chế độ toàn màn hình', 'info', 1000);
     },
 
     /**

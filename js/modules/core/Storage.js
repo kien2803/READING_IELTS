@@ -136,16 +136,19 @@ const Storage = {
             this.lastSaveTime = new Date().toISOString();
             localStorage.setItem(this.KEYS.LAST_SAVE, JSON.stringify(this.lastSaveTime));
             
-            // Show autosave indicator
-            this.showSaveIndicator();
+            // Show successful autosave indicator
+            this.showSaveIndicator(true);
             
             return true;
         } catch (error) {
             console.error('Storage set error:', error);
             
+            // Show failed autosave indicator
+            this.showSaveIndicator(false);
+            
             // Check if quota exceeded
             if (error.name === 'QuotaExceededError') {
-                Utils.showNotification('Bộ nhớ đầy! Hãy xóa bớt dữ liệu cũ.', 'error');
+                Utils.showNotification('Bộ nhớ full! Hãy xóa bớt dữ liệu.', 'error');
             } else {
                 Utils.showNotification('Lỗi khi lưu dữ liệu', 'error');
             }
@@ -171,7 +174,7 @@ const Storage = {
     /**
      * Show autosave indicator
      */
-    showSaveIndicator() {
+    showSaveIndicator(success = true) {
         // Clear existing timeout to debounce
         if (this.saveIndicatorTimeout) {
             clearTimeout(this.saveIndicatorTimeout);
@@ -194,19 +197,26 @@ const Storage = {
                 font-weight: 600;
                 z-index: 9999;
                 opacity: 0;
-                transition: opacity 0.3s ease;
+                transition: all 0.3s ease;
                 pointer-events: none;
             `;
             document.body.appendChild(indicator);
         }
         
-        indicator.textContent = '💾 Đã lưu tự động';
+        if (success) {
+            indicator.textContent = '💾 Đã lưu tự động';
+            indicator.style.background = 'rgba(40, 167, 69, 0.9)';
+        } else {
+            indicator.textContent = '❌ Lỗi lưu dữ liệu';
+            indicator.style.background = 'rgba(220, 53, 69, 0.9)';
+        }
+        
         indicator.style.opacity = '1';
         
-        // Use debounce - only hide after 1.5s of no more saves
+        // Use debounce - hide after 2s
         this.saveIndicatorTimeout = setTimeout(() => {
             indicator.style.opacity = '0';
-        }, 1500);
+        }, 2000);
     },
 
     /**
